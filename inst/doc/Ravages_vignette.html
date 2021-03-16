@@ -216,7 +216,7 @@ To learn more about all options of the functions, the reader is advised to look 
 <p>Below is an example of an association analysis and previous steps of data filtering using the dataset LCT available with the package Ravages. This dataset containts data from the 1000Genome project in the genomic region containing the Lactase gene. In this example, we look for an association between rare variants and the european populations of 1000Genomes. The population of each individual is available in the dataframe LCT.matrix.pop1000G.
 Details about each function is given right after this example.</p>
 
-<pre><code class="r">#Importation of data in a bed matrix
+<pre><code class="r">#Import data in a bed matrix
 x &lt;- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
 #Add population
 x@ped[,c(&quot;pop&quot;, &quot;superpop&quot;)] &lt;- LCT.matrix.pop1000G[,c(&quot;population&quot;, &quot;super.population&quot;)]
@@ -276,11 +276,11 @@ SKAT(x1, x1.H0.SKAT, params.sampling=list(perm.target = 10, perm.max = 500))
 </code></pre>
 
 <pre><code>##            stat      p.perm       p.chi2      p.value
-## R3HDM1 6.445786 0.001996008 1.253179e-06 1.253179e-06
-## UBXN4  2.136390 0.007984032 4.577413e-03 4.577413e-03
-## LCT    3.623174 0.001996008 8.031426e-04 8.031426e-04
-## MCM6   2.923228 0.001996008 6.261531e-04 6.261531e-04
-## DARS   2.132967 0.105769231 1.142385e-01 1.057692e-01
+## R3HDM1 6.445786 0.001996008 8.842962e-06 8.842962e-06
+## UBXN4  2.136390 0.005988024 7.857860e-03 7.857860e-03
+## LCT    3.623174 0.001996008 5.890045e-04 5.890045e-04
+## MCM6   2.923228 0.003992016 3.321858e-03 3.321858e-03
+## DARS   2.132967 0.082706767 1.101759e-01 8.270677e-02
 </code></pre>
 
 <h2>Defining genomic regions</h2>

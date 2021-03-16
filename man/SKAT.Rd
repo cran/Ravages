@@ -46,6 +46,8 @@ SKAT(x, NullObject, genomic.region = x@snps$genomic.region,
   If \code{NullObject$pheno.type = "continuous"}, the method from Liu et al. will be used to compute the p-value for the continuous phenotype, but \code{estimation.pvalue} can be set at "skewness" or "kurtosis".  
 
   If \code{debug=TRUE}, more informations about the estimated statistics moments are given.  
+
+  All missing genotypes are imputed by the mean genotype.
 }
 \value{
 A data frame containing for each genomic region: 
@@ -95,13 +97,13 @@ SKAT(x.sim, x.sim.H0, params.sampling = params.sampling)
 #Run SKAT with a random continuous phenotype
 #Null Model
 x.sim.H0.c <- NullObject.parameters(rnorm(100), RVAT = "SKAT", pheno.type = "continuous")
-SKAT(x.sim, x.sim.H0.c)
+SKAT(x.sim, x.sim.H0.c, cores = 1)
 
 
 
 \donttest{
 #Example on 1000Genome data
-#Importation of data in a bed matrix
+#Import data in a bed matrix
 x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
 #Add population
 x@ped[,c("pop", "superpop")] <- LCT.matrix.pop1000G[,c("population", "super.population")]

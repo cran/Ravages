@@ -1,4 +1,7 @@
 burden <- function(x, NullObject, genomic.region = x@snps$genomic.region, burden, maf.threshold = 0.5, get.OR.value = FALSE, alpha = 0.05, cores = 10, verbose = TRUE){
+  #Test if NullObject de bon type
+  if("P1" %in% names(NullObject)) stop("'NullObject' has been generated with wrong 'RVAT' in 'NullObject.parameters()'") 
+ 
   if(missing(x)) x <- NULL
   if(NullObject$pheno.type == "categorial"){
     if(verbose) cat("Categorial phenotype \n")

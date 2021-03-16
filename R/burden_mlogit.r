@@ -1,4 +1,5 @@
 burden.mlogit <- function(x, NullObject, genomic.region = x@snps$genomic.region, burden, maf.threshold = 0.5, get.OR.value = FALSE, alpha = 0.05, cores = 10){
+  
   if (is.numeric(burden)) {
     if (!is.matrix(burden)) {
       stop("Score is not a matrix")
@@ -8,11 +9,18 @@ burden.mlogit <- function(x, NullObject, genomic.region = x@snps$genomic.region,
         colnames(burden) <- make.names(1:ncol(burden))
       }
     }
+    #Check between number of individuals
+    if(nrow(burden) != length(NullObject$group)) stop("Different number of individuals in 'burden' and 'NullObject'")
     score <- burden
+
   }else {
     if (!is.factor(genomic.region)) stop("'genomic.region' should be a factor")
     genomic.region <- droplevels(genomic.region)
     if (missing(x)) stop("a bed.matrix 'x' is needed to compute the score")
+  
+    #Check between number of individuals
+    if(nrow(x) != length(NullObject$group)) stop("Different number of individuals in 'x' and 'NullObject'")
+
     if (burden == "CAST") {
       score <- CAST(x, genomic.region, maf.threshold)
     }else if (burden == "WSS") {
@@ -68,5 +76,8 @@ run.mlogit.withNull <- function (pheno, score, region, ref.level, alt.levels, co
       OR.values.sd <- OR.values[paste(region, alt.levels, sep = ":"), 2]
       results <- c(pval, is.err, OR.values.estimate, OR.values.estimate - quantile.alpha * OR.values.sd, OR.values.estimate + quantile.alpha * OR.values.sd)
     }else{ results <- c(pval, is.err)}
+    
+    #Cleaning temporary objects
+    rm(score) ; rm(data) ; rm(fit) ; rm(my.model) ; gc()
     return(results)
 }

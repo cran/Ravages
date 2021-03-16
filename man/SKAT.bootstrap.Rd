@@ -31,6 +31,8 @@
   If \code{debug=TRUE}, more informations about the estimated statistics moments are given.  
   
   This function is used by \code{SKAT} when the sample size is smaller than 2000 and covariates are present.
+
+  All missing genotypes are imputed by the mean genotype.
 }
 \value{
 A data frame containing for each genomic:
@@ -55,7 +57,7 @@ If \code{debug=TRUE}, other informations are given about the moments estimation:
 }
 \examples{
 \donttest{
-#Importation of data in a bed matrix
+#Import data in a bed matrix
 x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
 #Add population
 x@ped[,c("pop", "superpop")] <- LCT.matrix.pop1000G[,c("population", "super.population")]
