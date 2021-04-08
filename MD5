@@ -1,4 +1,4 @@
-23ef73cf4ca6804a617a43b639847162 *DESCRIPTION
+f56dc80a1b21dde906058dc7e356f874 *DESCRIPTION
 0c8b71899846b1e5382987294d538385 *NAMESPACE
 55f81212906d60cb080222ce247838c1 *NEWS
 a89e3111069eaca28057fe8b45b415b6 *R/CAST.r
@@ -16,7 +16,7 @@ a8b41d5ae9464bfb1a1e3d5334e2f06d *R/bed_matrix_split_genomic_region.r
 03820e3eb898cfc1d28c61a56be87d4b *R/burden.r
 429455bce1f7290cbff8c7a6a5ca0496 *R/burden_NullObject.r
 7d6abda322efb481dcce270d6e6d8d0a *R/burden_continuous.r
-72933e2205f90679013f00c3b9040616 *R/burden_mlogit.r
+10bfea6b218fa5f2ebbeaffc355c9556 *R/burden_mlogit.r
 223cf3dbe12f793678c029af02edcc31 *R/burden_weighted_matrix.r
 7d01bb1cd5dd3e69daa585d753eb5dca *R/filter_rare_variants.r
 2c5284eef6d5bc5e6f97b711e55b61e3 *R/genotypic.freq.r
@@ -46,10 +46,10 @@ ad9a33e406b8b18fa75a3b14c713fa24 *TODO
 3168ae14549677d4c98690a739a4ca80 *data/genes.b38.RData
 9a0ec09953f3bc2388c722196b67a496 *inst/doc/Ravages_Simulations_vignette.R
 b2b2bfb790fd78d9cbea834e0a008308 *inst/doc/Ravages_Simulations_vignette.Rmd
-3a69f1cf0792408e7d23aa5e4db19d12 *inst/doc/Ravages_Simulations_vignette.html
+060ef3352cb6740b4842d889ba255db4 *inst/doc/Ravages_Simulations_vignette.html
 2be31aad926e5e283c2864340d63fa50 *inst/doc/Ravages_vignette.R
 6cfc27f376a658488a430e4a3ef6bf65 *inst/doc/Ravages_vignette.Rmd
-b8640f7a8f011f742a4f3d8e3935cfc1 *inst/doc/Ravages_vignette.html
+1ec791318962ccdc1352a757bf098842 *inst/doc/Ravages_vignette.html
 17bf3c7c65cb6d92e1cfa027a77d60cb *man/CAST.Rd
 55f076388578f0be140b2640c7691cea *man/GRR.matrix.Rd
 9aa774e3bddca548c4f8607f0aa687e7 *man/GnomADgenes.Rd
