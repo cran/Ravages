@@ -1,6 +1,6 @@
-909ae0fa730c9996f3eaf45ba2d54f5a *DESCRIPTION
+3bfdd133b2cb4f73cc031048ab16fa63 *DESCRIPTION
 0c8b71899846b1e5382987294d538385 *NAMESPACE
-52a8ef691c36efe87f14f1c665815319 *NEWS
+9bf88e02eb6fc8147564d7d0f31ca6e5 *NEWS
 a89e3111069eaca28057fe8b45b415b6 *R/CAST.r
 06e0f438e36ec3d80ae1a6a03c5c1e80 *R/GRR_matrix.r
 4b6b85116cbaaec27062ec85b6b0b689 *R/NullObject_parameters.r
@@ -46,14 +46,14 @@ ad9a33e406b8b18fa75a3b14c713fa24 *TODO
 3168ae14549677d4c98690a739a4ca80 *data/genes.b38.RData
 9a0ec09953f3bc2388c722196b67a496 *inst/doc/Ravages_Simulations_vignette.R
 b2b2bfb790fd78d9cbea834e0a008308 *inst/doc/Ravages_Simulations_vignette.Rmd
-1caf06a2796ae571575ca5a9f2244fe3 *inst/doc/Ravages_Simulations_vignette.html
+12d715f25bc6f3086e24b71c622faf3a *inst/doc/Ravages_Simulations_vignette.html
 2be31aad926e5e283c2864340d63fa50 *inst/doc/Ravages_vignette.R
 6cfc27f376a658488a430e4a3ef6bf65 *inst/doc/Ravages_vignette.Rmd
-01138d8f943d56862a4de5c89db2db09 *inst/doc/Ravages_vignette.html
+e1048d835df94d15b4e05016f83f394c *inst/doc/Ravages_vignette.html
 17bf3c7c65cb6d92e1cfa027a77d60cb *man/CAST.Rd
 55f076388578f0be140b2640c7691cea *man/GRR.matrix.Rd
 9aa774e3bddca548c4f8607f0aa687e7 *man/GnomADgenes.Rd
-d45e689ad53dca08744cb73e9eaefbcc *man/Jaccard.Rd
+36f48b623ded036e3d1442828fa84511 *man/Jaccard.Rd
 d660c513320d9562d821256a0ae357ee *man/Kryukov.Rd
 6d418e81535a3c7b6f9c57c51fba8c9c *man/LCT.haplotypes.Rd
 da0c83dd3c935c389cd9c8e0c4fdc83c *man/LCT.matrix.Rd
