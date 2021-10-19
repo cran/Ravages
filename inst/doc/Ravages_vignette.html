@@ -206,28 +206,44 @@ hr {
 <body>
 <h2>Introduction</h2>
 
-<p>Ravages was developped to simulate genetic data and to perform rare variant association tests (burden tests and the variance-component test SKAT) on more than two groups of individuals (Bocher et al., 2019, doi:10.1002/gepi.22210). Ravages relies on the package Gaston developped by Herve Perdry and Claire Dandine-Roulland. Most functions are written in C++ thanks to the packages Rcpp, RcppParallel and RcppEigen.<br/>
-Functions of Ravages use bed.matrix to manipulate genetic data as in the package Gaston (see documentation of this package for more details).<br/>
-In this vignette, we illustrate how to perform rare variant association tests on real data. A second vignette is available showing how to simulate genetic data and how to use them for power calculation.
+<p>Ravages was developped to simulate genetic data and to perform rare variant association tests (burden tests and the variance-component test SKAT) on different types of phenotypes (Bocher et al., 2019, doi:10.1002/gepi.22210, Bocher et al., 2020, doi:10.1038/s41431-020-00792-8) at a genome-wide scale. Ravages relies on the package Gaston developped by Herve Perdry and Claire Dandine-Roulland. Most functions are written in C++ thanks to the packages Rcpp, RcppParallel and RcppEigen.  </p>
+
+<p>Functions of Ravages use bed.matrix to manipulate genetic data as in the package Gaston (see documentation of this package for more details).  </p>
+
+<p>In this vignette, we illustrate how to perform rare variant association tests on real data on different phenotypes at a genome-wide scale. A second vignette is available showing how to simulate genetic data and how to use them for power calculation.
 To learn more about all options of the functions, the reader is advised to look at the manual pages.</p>
+
+<h3>Global parameters of Ravages</h3>
+
+<p>Functions in Ravages are parallelised either using RcppParallel when functions are implemented in C++ or using parallel otherwise. When the argument <em>cores</em> is present in the function, it can be directly changed to fix the number of cores to use. Otherwise, the number of threads used by multithreaded functions can be modified through RcppParallel function <strong>setThreadOptions()</strong>. It is advised to try several values for the number of threads, as using too many threads might be counterproductive due to an important overhead. The default value set by RcppParallel is generally too high.  </p>
+
+<p>Information on progression is provided if <em>verbose = T</em> for multiple functions in Ravages. </p>
 
 <h2>Example of analysis using LCT data</h2>
 
-<p>Below is an example of an association analysis and previous steps of data filtering using the dataset LCT available with the package Ravages. This dataset containts data from the 1000Genome project in the genomic region containing the Lactase gene. In this example, we look for an association between rare variants and the european populations of 1000Genomes. The population of each individual is available in the dataframe LCT.matrix.pop1000G.
-Details about each function is given right after this example.</p>
+<p>Below is an example of an association analysis and previous steps of data filtering using the dataset <code>LCT.matrix</code> available with the package Ravages. This dataset containts data from the 1000Genome project in the locus containing the Lactase gene. In this example, we look for an association between rare variants and the european populations of 1000Genomes. The population of each
+individual is available in the dataframe <code>LCT.matrix.pop1000G</code>. A classical analysis by gene is performed, and an analysis using the strategy &ldquo;RAVA-FIRST&rdquo;.  </p>
 
-<pre><code class="r">#Import data in a bed matrix
+<p>Details about the &ldquo;RAVA-FIRST&rdquo; strategy and each function is given right after this example.</p>
+
+<pre><code class="r"># Import data in a bed matrix
 x &lt;- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
-#Add population
+# Add population
 x@ped[,c(&quot;pop&quot;, &quot;superpop&quot;)] &lt;- LCT.matrix.pop1000G[,c(&quot;population&quot;, &quot;super.population&quot;)]
 
-#Select EUR superpopulation
+# Select EUR superpopulation
 x &lt;- select.inds(x, superpop==&quot;EUR&quot;)
 x@ped$pop &lt;- droplevels(x@ped$pop)
 
 # Group variants within know genes by extending their positions
 # 500bp upstream and downstream
+# (the function uses build 37 unless told otherwise)
 x &lt;- set.genomic.region(x, flank.width=500)
+</code></pre>
+
+<p>\goodbreak</p>
+
+<pre><code class="r"># a quick look at the result
 table(x@snps$genomic.region, useNA = &quot;ifany&quot;)
 </code></pre>
 
@@ -266,7 +282,7 @@ burden(x1, NullObject = x1.H0.burden, burden = &quot;CAST&quot;, cores = 1)
 </code></pre>
 
 <pre><code class="r"># run SKAT, using the 1000Genome population as &quot;outcome&quot;
-# Null model for SKAT with only few permutations
+# COnstruct null model for SKAT, then run test with only a few permutations
 x1.H0.SKAT &lt;- NullObject.parameters(x1@ped$pop, RVAT = &quot;SKAT&quot;, pheno.type = &quot;categorial&quot;)
 SKAT(x1, x1.H0.SKAT, params.sampling=list(perm.target = 10, perm.max = 500))
 </code></pre>
@@ -276,45 +292,55 @@ SKAT(x1, x1.H0.SKAT, params.sampling=list(perm.target = 10, perm.max = 500))
 </code></pre>
 
 <pre><code>##            stat      p.perm       p.chi2      p.value
-## R3HDM1 6.445786 0.001996008 1.478821e-07 1.478821e-07
-## UBXN4  2.136390 0.005988024 2.621828e-03 2.621828e-03
-## LCT    3.623174 0.001996008 2.064624e-04 2.064624e-04
-## MCM6   2.923228 0.003992016 1.618652e-03 1.618652e-03
-## DARS   2.132967 0.047210300 7.882175e-02 4.721030e-02
+## R3HDM1 6.445786 0.001996008 4.713450e-06 4.713450e-06
+## UBXN4  2.136390 0.007984032 6.780292e-03 6.780292e-03
+## LCT    3.623174 0.001996008 2.108524e-04 2.108524e-04
+## MCM6   2.923228 0.011976048 6.050588e-03 6.050588e-03
+## DARS   2.132967 0.072368421 1.207254e-01 7.236842e-02
+</code></pre>
+
+<pre><code class="r"># run a similar analysis but using the RAVA-FIRST approach with WSS
+# RAVA-FIRST(x1, filter = &quot;whole&quot;, maf.threshold = 0.01, min.nb.snps = 10,
+#           burden = TRUE, x1.H0.burden, SKAT = F)
 </code></pre>
 
 <h2>Defining genomic regions</h2>
 
-<p>For rare variant association tests, the unit of analysis is not a single variant but a genomic region, typically a gene. The first step of the analysis is therefore to group variants into genomic regions. This can be done using the function <strong>set.genomic.region()</strong> and known gene positions. It works on a bed.matrix (see Gaston) and simply adds a column &ldquo;genomic.region&rdquo; to the slot x@snps containing the genomic region (a factor) assigned to each variant. Gene positions should be given to <em>regions</em> as a dataframe containing the following columns: <em>Chr</em>, <em>Start</em>, <em>End</em>, <em>Gene_Name</em>. The dataframe should absolutely be ordered in the genome order, as well as the levels of <em>regions$Gene_Name</em>. By default, any variant being outside the gene positions won&#39;t be annotated. Gene positions can be extended to annotate more variants using the argument <em>flank.width</em> corresponding to the number of base pairs upstream and downstream the gene. If <em>flank.width=Inf</em>, each variant will be assigned to the nearest gene. If two regions overlap, variants in the overlapping zone will be attributed to both regions, separated by a comma.<br/>
-The files <strong>genes.b37</strong> and <strong>genes.b38</strong> available in Ravages which contain gene positions from ENSEMBL versions hg19 and hg38 can be used for <em>regions</em> to define gene positions. </p>
+<p>For rare variant association tests, the unit of analysis is not a single variant but a genomic region or &#39;testing unit&#39;, typically a gene. The first step of the analysis is therefore to group variants into genomic regions. This can be done using the function <strong>set.genomic.region()</strong> and known regions positions. It works on a bed.matrix (see Gaston) and simply adds a column
+&ldquo;genomic.region&rdquo; to the slot <code>x@snps</code> containing the genomic region (a factor) assigned to each variant. The positions of regions should be given to <em>regions</em> as a dataframe in a bed format containing the following columns: <em>Chr</em>, <em>Start</em> (0-based), <em>End</em> (1-based), <em>Name</em>. The dataframe should absolutely be ordered in the genome order, as well as the levels of <em>regions$Name</em>. </p>
 
-<h2>Multiple genomic regions for a variant</h2>
+<p>By default, any variant being outside the gene positions won&#39;t be annotated. Regions boundaries can be extended to include more variants using the argument <em>flank.width</em> corresponding to the number of base pairs upstream and downstream the region to which expand the positions. If <em>flank.width=Inf</em>, each variant will be assigned to the nearest region. </p>
 
-<p>If variants are annotated to multiple genomic regions, they can be split in a new bed matrix using the function <strong>bed.matrix.split.genomic.region()</strong>. This function takes a bed matrix as argument (<em>x</em>) and duplicates variants being assigned to multiple regions separated by <em>split.pattern</em>. If <em>changeID=TRUE</em>, the id from the bedmatrix will be changed to the format chr:pos:A1:A2:genomic.region to distinguish the duplicated variants.<br/>
-An example is shown below:</p>
+<p>If two regions overlap, variants in the overlapping zone will be attributed to both regions, separated by a comma. By default, <em>split=TRUE</em> in <strong>set.genomic.region()</strong>, which means that variants attributed to multiple regions will be duplicated in the bed matrix. This is done by calling the function <strong>bed.matrix.split.genomic.region()</strong> which takes a bed matrix as argument (<em>x</em>) and duplicates variants being assigned to multiple regions separated by <em>split.pattern</em>. If <em>changeID=TRUE</em>, the id from the bedmatrix will be changed to the format chr:pos:A1:A2:genomic.region to distinguish the duplicated variants.  </p>
 
-<pre><code class="r">#Example bed matrix with 4 variants
+<p>The files <strong>genes.b37</strong> and <strong>genes.b38</strong> available in Ravages which contain gene positions from ENSEMBL versions GRCH37 and GRCH38 can be used as <em>regions</em>.  </p>
+
+<p>Running the following toy example will show you the behavior of these functions.</p>
+
+<pre><code class="r"># Example bed matrix with 4 variants
 x.ex &lt;- as.bed.matrix(x=matrix(0, ncol=4, nrow=10),
                       bim=data.frame(chr=1:4, id=paste(&quot;rs&quot;, 1:4, sep=&quot;&quot;), 
                                      dist = rep(0,4), pos=c(150,150,200,250), 
                                      A1=rep(&quot;A&quot;, 4), A2=rep(&quot;T&quot;, 4)))
 
-#Example genes dataframe
+# Example genes dataframe
 genes.ex &lt;- data.frame(Chr=c(1,1,3,4), Start=c(10,110,190,220), End=c(170,180,250,260),
                        Gene_Name=factor(letters[1:4]))
 
-#Attribute genomic regions
-x.ex &lt;- set.genomic.region(x.ex, regions = genes.ex)
+# Attribute genomic regions without splitting the variants
+# attributed to multiple genomic regions
+x.ex &lt;- set.genomic.region(x.ex, regions = genes.ex, split = FALSE)
 x.ex@snps$genomic.region
 
-#Split genomic regions
+# Split genomic regions
 x.ex.split &lt;- bed.matrix.split.genomic.region(x.ex, split.pattern = &quot;,&quot;)
 x.ex.split@snps$genomic.region
 </code></pre>
 
-<h2>Rare variant definition</h2>
+<h2>Rare variant selection</h2>
 
-<p>To perform rare variant analysis, it is also important to define what is a rare variant in order to leave out common ones. The function <strong>filter.rare.variants()</strong> enables to keep only variants with a MAF (Minor Allele Frequency) below a given threshold while leaving out monomorphic variants. This function uses and returns a bed.matrix which can be filtered in three different ways:  </p>
+<p>###Frequency filter
+To perform rare variant analysis, it is also important to define what is a rare variant in order to leave out common ones that are expected to have a weaker functional impact. The function <strong>filter.rare.variants()</strong> enables to keep only variants with a MAF (Minor Allele Frequency) below a given threshold while leaving out monomorphic variants. This function uses and returns a bed.matrix which can be filtered in three different ways:  </p>
 
 <ul>
 <li>If <em>filter=&ldquo;whole&rdquo;</em>, all the variants with a MAF lower than the threshold in the entire sample will be kept. </li>
@@ -322,25 +348,27 @@ x.ex.split@snps$genomic.region
 <li>If <em>filter=&ldquo;any&rdquo;</em>, all the variants with a MAF lower than the threshold in any of the groups will be kept.<br/></li>
 </ul>
 
-<p>It is also possible to specify the minimum number of variants needed in a genomic region to keep it using the parameter <em>min.nb.snps</em>.  </p>
+<p>It is also possible to specify the minimum number of variants needed in a genomic region to keep it using the parameter <em>min.nb.snps</em>, as well as the minimum cumulative MAF using <em>min.cumulative.maf</em>.  </p>
 
-<p>For the filter <em>any</em> and <em>controls</em>, the group of each individual should be given as a factor to <em>group</em>.</p>
+<p>For the <em>any</em> and <em>controls</em> filters, the group of each individual should be given as a factor to <em>group</em>.</p>
 
 <h2>Rare variant association tests</h2>
 
-<p>We have implemented two burden tests extensions (CAST and WSS) and an extension of the variance-component test SKAT to perform the association tests between a gene and more than two groups of individuals.<br/>
-The general idea of burden tests is to compute a genetic score per individual and per genomic region and to test if it differs between the different groups of individuals. To extend these tests to more than two groups of individuals, a non-ordinal multinomial regression is used. The independant variable in this regression is the genetic effect of the gene represented by the genetic score. Covariates can be added in the model. In addition to the genetic scores CAST and WSS directly implemented in the package, the user can specify another genetic score for the regression.<br/>
-The variance-component test SKAT looks at the dispersion of genetics effects of rare variants. A geometrical interpretation of the test was used for its extension to more than two groups of individuals. Covariates can also be included in this model.</p>
+<p>We have implemented two burden tests extensions (CAST and WSS, doi:10.1002/gepi.22210) and an extension of the variance-component test SKAT (doi:10.1038/s41431-020-00792-8) to perform the association tests between a region and more than two groups of individuals. </p>
+
+<p>The general idea of burden tests is to compute a genetic score per individual and per genomic region and to test if its distribution differs between the different groups of individuals. To extend these tests to more than two groups of individuals, a non-ordinal multinomial regression is used. The independant variable in this regression is the genetic effect of the region represented by the genetic score. Covariates can be added in the model. In addition to the genetic scores CAST and WSS directly implemented in the package, the user can specify another genetic score for the regression.  </p>
+
+<p>The variance-component test SKAT looks at the dispersion of genetics effects of rare variants. A geometrical interpretation of the test was used for its extension to more than two groups of individuals. Covariates can also be included in this model.</p>
 
 <h3>Genetic score for burden tests</h3>
 
-<p>We have implemented two functions to compute CAST and WSS scores respectively. These functions return a matrix with one row per individual and one column by genomic region. They are directly called in the function <strong>burden()</strong> if these scores are used to perform the association tests. It is also possible to compute genetic scores in a genomic region based on a vector of weights for each variant using the function <strong>burden.weighted.matrix()</strong>.  </p>
+<p>We have implemented two functions to compute CAST and WSS scores respectively. These functions return a matrix with one row per individual and one column by genomic region. They are directly called in the function <strong>burden()</strong> if these scores are used to perform the association tests. It is also possible to compute genetic scores in a genomic region based on a vector of weights for each variant using the function <strong>burden.weighted.matrix()</strong>. It is important to note that all burden functions compute a score for the rare alleles. Therefore, if the reference allele is rare, the alleles will be flipped and the reference allele will be counted in the score instead of the alternative allele. This can be avoided only in the <strong>CAST()</strong> score if <em>flip.rare.alleles = FALSE</em> (it is set at <em>TRUE</em> by default). </p>
 
 <h4>CAST</h4>
 
-<p>CAST is based on a binary score which has a value of one if an individual carries at least one variant in the considered genomic region, and 0 otherwise. A MAF threshold for the definition of a rare variant is therefore needed as an argument to <em>maf.threshold</em>. This score can be computed using the function <strong>CAST()</strong> as shown here on the LCT data:</p>
+<p>CAST is based on a binary score which has a value of one if an individual carries at least one variant in the considered genomic region, and 0 otherwise. A MAF threshold for the definition of a rare variant is therefore needed (argument <em>maf.threshold</em>). This score can be computed using the function <strong>CAST()</strong> as shown here on the LCT data:</p>
 
-<pre><code class="r">#Calculation of the genetic score with a maf threshold of 1%
+<pre><code class="r"># Calculation of the genetic score with a maf threshold of 1%
 CAST.score &lt;- CAST(x = x1, genomic.region = x1@snps$genomic.region, maf.threshold = 0.01)
 head(CAST.score)
 </code></pre>
@@ -359,7 +387,7 @@ head(CAST.score)
 <p>WSS (Weighted Sum Statistic) is based on a continuous score giving the highest weights to the rarest variants: 
 \[ WSS_j = \sum_{i=1}^{R} I_{ij} \times  w_{i}\] 
 with \[w_{i} = \frac{1}{\sqrt{t_{i} \times  q_{i} \times  (1-q_{i})}}\] and \[q_{i} = \frac{n_{i} + 1}{2 t_{i}+1}\]
-Where \(n_{i}\) is the total number of minor alleles genotyped for variant \(i\), \(t_{i}\) is the total number of alleles genotyped for variant \(i\) and \(I_{ij}\) is the number of minor alleles of variant \(i\) for the invidual \(j\). In the original method, each variant is weighted according to its frequency in the controls group. In our version of WSS, the weights depend on allele frequencies calculated on the entire sample. The function <strong>WSS()</strong> can be used to compute the WSS score as shown on the LCT data:</p>
+Where \(n_{i}\) is the total number of minor alleles genotyped for variant \(i\), \(t_{i}\) is the total number of alleles genotyped for variant \(i\) and \(I_{ij}\) is the number of minor alleles of variant \(i\) for the invidual \(j\). In the original method, each variant is weighted according to its frequency in the controls group. In our version of WSS, the weights depend on allele frequencies calculated on the entire sample ; this avoids using permutations. The function <strong>WSS()</strong> can be used to compute the WSS score as shown on the LCT data:</p>
 
 <pre><code class="r">WSS.score &lt;- WSS(x = x1, genomic.region = x1@snps$genomic.region)
 head(WSS.score)
@@ -376,7 +404,7 @@ head(WSS.score)
 
 <h4>Other genetic scores</h4>
 
-<p>It is also possible to compute other genetic scores based on variants weights using the function <strong>burden.weighted.matrix()</strong>. The weights should be given as a vector to <em>weights</em> having the same size as the number of variants. The genetic score will be compute as:
+<p>It is also possible to compute other genetic scores based on variants weights using the function <strong>burden.weighted.matrix()</strong>. The weights should be given as a vector to <em>weights</em> (with the length as the number of variants). The genetic score will be compute as:
 \[Score_j = \sum_{i=1}^{R} I_{ij} \times  w_{i}\]
 with \(w_i\) the weight of each variant in <em>weights</em>, and \(I_{ij}\) the number of minor alleles for individual \(j\) in variant \(i\).<br/>
 Here is an example corresponding to a genetic score with all the weights at 1, i.e. counting the number of minor alleles:</p>
@@ -396,86 +424,184 @@ head(Sum.score)
 
 <h4>Regressions</h4>
 
-<p>We have extended CAST and WSS using non-ordinal multinomial regression models. Let consider \(C\) groups of individuals including a group of controls (\(c=1\)) and \(C-1\) groups of cases with different sub-phenotypes of the disease. We can compute \(C-1\) probability ratios, one for each group of cases: \[ln \frac{P(Y_{j}=c)}{P(Y_{j}=1)} = \beta_{0,c} + \beta_{G,c}X_{G} + \beta_{k1,c}K_{1}+&hellip;+\beta_{kl,c}K_{l}\]
-Where \(Y_{j}\) corresponds to the phenotype of the individual \(j\) and \(K_{l}\) is a vector for the $l$th covariate with the corresponding coefficient \(\beta_{kl}\). The genetic effect is represented by \(X_{G}\) and correspond to the genetic score CAST or WSS with \(\beta_{G,c}\) the log-odds ratio associated to this burden score.<br/>
-The p-value associated to the genetic effect is calculated using a likelihood ratio test comparing this model to the same model without the genetic effect (null hypothesis). If only two groups are compared, a classical logistic regression is performed.<br/>
-This regression can be performed on a bed.matrix using the function <strong>burden()</strong> which relies on the package mlogit. Parameters under the null model can be obtained using the function <strong>NullObject.parameters()</strong>. To generate this null model, the <em>pheno</em> of each individual should be given as a factor, and the potential covariates to include in the model should be given as a matrix to the argument <em>data</em> (one row per individual and one column by covariate). If only a subset of covariates from <em>data</em> are to be included in the model, a R formula should be given to <em>formula</em> with these covariates, otherwise all the covariates will be included. In addition, the reference group should be given to the argument <em>ref.level</em>, i.e. all odds ratios will be computed in comparison to this group of individuals in the regression on the score. The choice of the reference group won&#39;t affect the p-value. As the parameters needed to run the association tests depend on the type of test performed (burden tests or SKAT), and the type of phenotype (continuous or categorial), both arguments shouls be given to <strong>NullObject.parameters()</strong> (<em>RVAT</em> and <em>pheno.type</em> respectively).<br/>
-<strong>NullObject.parameters()</strong> will return a list with the parameters to use in <strong>burden()</strong> to run the burden test, including the Log-Likelihood computed under the null model, the argument <em>data</em> with the covariates to include determined from the argument <em>formula</em>.<br/>
-Once the null model has been run, the function <strong>burden()</strong> can be used to perform burden tests. To do so, the user needs to give the results from <strong>NullObject.parameters()</strong> to the argument <em>NullObject</em>, and needs to specify the genomic region associated to each variant (argument <em>genomic.region</em>).<br/>
-The  CAST or WSS genetic scores can be directly calculated in the regression (<em>burden=&ldquo;CAST&rdquo;</em> or <em>burden=&ldquo;WSS&rdquo;</em>). The user can also use another genetic score in the regression, which has to be specified as a matrix with one individual per row and one genomic region per column to <em>burden</em>.  In this situation, no bed matrix is needed, and the result from <strong>burden.weighted.matrix()</strong> can be used directly.<br/>
-To speed up the computation time when the phenotype is categorial, calculations can be parallelised using the argument <em>cores</em>, set at 10 by default.<br/>
-<strong>burden()</strong> will return the p-value associated to the regression for each genomic region. If there is a convergence problem with the regression, the function will return 1 in the column <em>is.err</em>. The odds ratio associated to each group of cases compared to the reference group (<em>NullObject$ref.level</em>) with its confidence interval at a given alpha threshold (argument <em>alpha</em>) can also be obtained if <em>get.OR.value=TRUE</em>.<br/>
-An example of the p-value and OR calculation with its 95% confidence interval using WSS on the LCT data is shown below with or without the inclusion of covariates. The outcome here corresponds to the population from 1000Genome.</p>
+<p>We have extended burden tests using a non-ordinal multinomial regression model. Let consider \(C\) groups of individuals including a group of controls (\(c=0\)) and \(C-1\) groups of cases with different sub-phenotypes of the disease. We can compute \(C-1\) probability ratios, one for each group of cases: \[ln \frac{P(Y_{j}=c)}{P(Y_{j}=0)} = \beta_{0,c} + \beta_{G,c}X_{G} + \beta_{k1,c}K_{1}+&hellip;+\beta_{kl,c}K_{l}\]
+where \(Y_{j}\) corresponds to the phenotype of the individual \(j\) and \(K_{l}\) is a vector for the $l$th covariate with the corresponding coefficient \(\beta_{kl}\). The genetic effect is represented by \(X_{G}\) and correspond to the genetic score (for example CAST or WSS) with \(\beta_{G,c}\) the log-odds ratio associated to this burden score.  </p>
 
-<pre><code class="r">#Null model
+<p>The p-value associated to the genetic effect is calculated using a likelihood ratio test comparing this model to the same model without the genetic effect (null hypothesis). If only two groups are compared, a classical logistic regression is performed.  </p>
+
+<p>This regression can be performed on a bed.matrix using the function <strong>burden()</strong> which relies on the package mlogit. Parameters under the null model can be obtained using the function <strong>NullObject.parameters()</strong>. To generate this null model, the phenotype (argument <em>pheno</em>) of each individual should be given as a factor, and the potential covariates to include in the model should be given as a matrix to the argument <em>data</em> (one row per individual and one column per covariate). If only a subset of covariates from <em>data</em> are to be included in the model, a R formula should be given to <em>formula</em> with these covariates, otherwise all the covariates will be included. In addition, the reference group should be given to the argument <em>ref.level</em>, i.e. all odds ratios will be computed in comparison to this group of individuals. The choice of the reference group won&#39;t affect the p-value. As the parameters needed to run the association tests depend on the type of test performed (burden tests or SKAT), and the type of phenotype (continuous or categorial), both arguments shouls be given to <strong>NullObject.parameters()</strong> (<em>RVAT</em> and <em>pheno.type</em> respectively).  </p>
+
+<p>The function <strong>NullObject.parameters()</strong> will return a list with the parameters to use in <strong>burden()</strong> to run the burden test, including the Log-Likelihood computed under the null model, the argument <em>data</em> with the covariates to include determined from the argument <em>formula</em>.  </p>
+
+<p>Once the null model has been created, the function <strong>burden()</strong> can be used to perform burden tests. To do so, the user needs to give the results from <strong>NullObject.parameters()</strong> to the argument <em>NullObject</em>, and needs to specify the genomic region associated to each variant (argument <em>genomic.region</em>).  </p>
+
+<p>The  CAST or WSS genetic scores can be directly calculated in the regression (<em>burden=&ldquo;CAST&rdquo;</em> or <em>burden=&ldquo;WSS&rdquo;</em>). The user can also use another genetic score in the regression, which has to be specified as a matrix with one row per individual and one column per genomic region to <em>burden</em>.  In this situation, no bed matrix is needed, and the result from <strong>burden.weighted.matrix()</strong> can be used directly.  </p>
+
+<p>To shorten the computation time, calculations are parallelised; the argument <em>cores</em>, set at 10 by default, controls the parallelisation.</p>
+
+<p>The function <strong>burden()</strong> will return the p-value associated to the regression for each genomic region. If there is a convergence problem with the regression, the function will return 1 in the column <em>is.err</em>. The effect size (odds ratio for categorial phenotypes and beta value for continuous phenotypes) associated to each group of cases compared to the reference group (<em>NullObject$ref.level</em>) with its confidence interval at a given alpha threshold (argument <em>alpha</em>) can also be obtained with <em>get.effect.size=TRUE</em>.   </p>
+
+<p>An example of the p-value and OR calculation with its 95% confidence interval using WSS on the LCT data is shown below with or without the inclusion of covariates. The outcome here corresponds to the population from 1000Genome.</p>
+
+<pre><code class="r"># Null model
 x1.H0 &lt;- NullObject.parameters(x1@ped$pop, ref.level = &quot;CEU&quot;, 
                                RVAT = &quot;burden&quot;, pheno.type = &quot;categorial&quot;)
 # WSS 
 burden(x = x1, NullObject = x1.H0, burden =&quot;WSS&quot;, 
-      alpha=0.05, get.OR.value=TRUE, cores = 1)
+      alpha=0.05, get.effect.size=TRUE, cores = 1)
 
-#Sex + a simulated variable as covariates
+# Sex + a simulated variable as covariates
 sex &lt;- x1@ped$sex
 u &lt;- runif(nrow(x1))
 covar &lt;- cbind(sex, u)
-#Null model with the covariate &quot;sex&quot;
+# Null model with the covariate &quot;sex&quot;
 x1.H0.covar &lt;- NullObject.parameters(x1@ped$pop, ref.level = &quot;CEU&quot;,
                                      RVAT = &quot;burden&quot;, pheno.type = &quot;categorial&quot;,
                                      data = covar, formula = ~ sex)
 
-#Regression with the covariate &quot;sex&quot; without OR values
-#Using the score matrix WSS computed previously
+# Regression with the covariate &quot;sex&quot; without OR values
+# Using the score matrix WSS computed previously
 burden(NullObject = x1.H0.covar, burden=WSS.score, cores = 1)
 </code></pre>
 
 <p>Finally, using Ravages, it is also possible to perform burden tests with a continuous phenotype by specifying <em>pheno.type = &ldquo;continuous&rdquo;</em>, and by giving a numeric vector to <em>pheno</em> as showed below:</p>
 
-<pre><code class="r">#Random continuous phenotype
+<pre><code class="r"># Random continuous phenotype
 set.seed(1) ; pheno1 &lt;- rnorm(nrow(x1))
-#Null model
+# Null model
 x1.H0.continuous &lt;- NullObject.parameters(pheno1, RVAT = &quot;burden&quot;, 
                                           pheno.type = &quot;continuous&quot;)
-#Test CAST 
-burden(x1, NullObject = x1.H0.continuous, burden = &quot;CAST&quot;)
+# Test CAST 
+burden(x1, NullObject = x1.H0.continuous, burden = &quot;CAST&quot;, cores = 1)
+</code></pre>
+
+<p>###Functionally-informed burden tests
+Finally, we offer to perform functionally-informed burden tests to take into account functional information. To do so, we propose to define genomic regions (for example a gene of interest) and to integrate sub-scores in the regression corresponding to different functional categories (for example distinguish between coding and regulatory variants). A burden test will then be applied for each genomic region but will take into account the different categories of variants. The number of freedom corresponds to: (number of groups of individuals - 1) * number of sub-scores.  </p>
+
+<p>To attribute variants to genomic region and subregions, the function <strong>set.genomic.region.subregion()</strong> needs to be used which is very similar to <strong>set.genomic.region()</strong>. Two dataframes (in bed format) should be included: one for the large genomic regions (regions), and one for the subregions (subregions). Two columns will be added to <em>x@snps</em>: <em>genomic.region</em> and <em>SubRegion</em>.  </p>
+
+<p>The function <strong>burden.subscores()</strong> can then be applied on this bed matrix, which works similarily as <strong>burden()</strong>, with the extra argument <em>SubRegion</em> corresponding to the vector with the subregions on which subscores should be computed. In addition, the argument <em>burden.function</em> replaces the argument <em>burden</em> in <strong>burden()</strong> and requires to give a function which determines how the genetic score is computed (for example <em>CAST</em> or <em>WSS</em>).  </p>
+
+<p>Below is an example of the two functions where subscores correspond to coding and regulatory categories in the LCT locus.</p>
+
+<pre><code class="r"># *** Functionally-informed WSS analysis ***
+# Attribution of variants to regions and subregions
+x2 &lt;- set.genomic.region.subregion(x, regions = genes.b37,
+                                  subregions = subregions.LCT)
+# Burden test
+burden.subscores(x2, x1.H0.burden, cores = 1)
+</code></pre>
+
+<pre><code>## Categorial phenotype
+</code></pre>
+
+<pre><code>##             p.value n_subscores is.err
+## R3HDM1           NA           3      1
+## UBXN4  2.626565e-21           2      0
+## LCT              NA           3      1
+## MCM6   3.488717e-31           2      0
+## DARS             NA           3      1
 </code></pre>
 
 <h3>SKAT</h3>
 
-<p>We also extended the variance-component test SKAT using a geometric interpretation. Unlike the burden tests, the is no burden calculated in this test: the distribution of the genetic effects in the genomic region is compared to a null distribution. SKAT is based on a linear mixed model where the random effects correspond to the genetic effects.<br/>
-Before running the SKAT association test, the function <strong>NullObject.parameters()</strong> first needs to be called as for the burden tests, by specifying <em>RVAT = &ldquo;SKAT&rdquo;</em>. The group of each individual should be given as a factor to <em>pheno</em> if a categorial phenotype is studied, and as a numeric vector is a continuous phenotype is studied. As before, potential covariates should be included as a matrix to <em>data</em>. If only some of them are to be included, they should be given as a R formula to <em>formula</em>. This function will compute parameters to use the <strong>SKAT()</strong> function, and should be given to this function using the argument <em>NullObject</em>.<br/>
-To compute the p-values, a chi-square approximation is used based on the statistics&#39; moments. The moments can either be estimated using a sampling procedure, or be analytically computed using the method from Liu et al. 2008. The chi-square approximation can be based on the first three moments (<em>estimation.pvalue = &ldquo;skewness&rdquo;</em>), or on moments 1, 2 and 4 to have a more precise estimation of the tail distribution (<em>estimation.pvalue = &ldquo;kurtosis&rdquo;</em>). If <em>get.moments = &ldquo;theoretical&rdquo;</em> and <em>estimation.pvalue = &ldquo;skewness&rdquo;</em>, it is equivalent to the &ldquo;liu&rdquo; method in the SKAT package, and if <em>estimation.pvalue = &ldquo;kurtosis&rdquo;</em>, it corresponds to the &ldquo;liu.mod&rdquo; method in the SKAT package. If <em>debug = TRUE</em>, the statistics&#39; moments will be returned in addition to the p-values.<br/>
-If the sample size is lower than 2000, we recommand to use the sampling procedure. If no covariates are present, a simple permutation procedure can be used (<em>get.moments = &ldquo;permutations&rdquo;</em>), otherwise, a boostrap sampling should be used (<em>get.moments = &ldquo;bootstrap&rdquo;</em>). For those two situations, a sequential procedure is used to compute the p-values: permutated statistics are computed and each one is compared to the observed statistics. The sampling procedure stops when either <em>perm.target</em> (the number of times a permutated statistics should be greater than the observed statistics) or <em>perm.max</em> (the maximum number of permutations to perform) is reached. P-values are then computed in two different ways: if <em>perm.target</em> is reached, the p-value is computed as <em>perm.target</em> divided by the number of permutations performed to reach this value; if <em>perm.max</em> is reached before <em>perm.target</em> (that is, for pretty small p-values), p-values are computed using the chi-square approximation based on moments estimated from the permutated statistics. <em>perm.target</em> and <em>perm.max</em> should be given as a list to the argument <em>params.sampling</em> of SKAT.<br/>
-If the sample size is bigger than 2000, the analytical calculation from Liu et al. can be used to compute the theoretical moments. In this situation, it is possible to parallelise the calculations using the argument <em>cores</em>, set at 10 by default.<br/>
-It is possible to clearly ask for a specific method to compute the moments using <em>get.moments = &ldquo;permutations&rdquo;</em>, <em>&ldquo;bootstrap&rdquo;</em> or <em>&ldquo;theoretical&rdquo;</em>. By default, <em>get.moments = &ldquo;size.based&rdquo;</em>, and the method will depend on the sample size.<br/>
-An example of the SKAT function by specifying the &ldquo;permutations&rdquo; or &ldquo;theoretical&rdquo; method is shown. </p>
+<p>We also extended the variance-component test SKAT using a geometric interpretation. Unlike the burden tests, the is no burden calculated in this test: the distribution of the genetic effects in the genomic region is compared to a null distribution. SKAT is based on a linear mixed model where the random effects correspond to the genetic effects.  </p>
 
-<pre><code class="r">#Null model
+<p>Before running SKAT, the function <strong>NullObject.parameters()</strong> first needs to be called as for the burden tests, but by specifying <em>RVAT = &ldquo;SKAT&rdquo;</em>. As before, potential covariates could be included as a matrix to <em>data</em>. If only some of them are to be included, they should be given as a R formula to <em>formula</em>. This function will compute parameters to use the <strong>SKAT()</strong> function, and should be given to this function using the argument <em>NullObject</em>.  </p>
+
+<p>To compute the p-values, a chi-square approximation is used based on the statistics&#39; moments. The moments can either be estimated using a sampling procedure, or be analytically computed using the method from Liu et al. 2008. The chi-square approximation can be based on the first three moments (<em>estimation.pvalue = &ldquo;skewness&rdquo;</em>), or on moments 1, 2 and 4 to have a more precise estimation of the tail distribution (<em>estimation.pvalue = &ldquo;kurtosis&rdquo;</em>). If <em>get.moments = &ldquo;theoretical&rdquo;</em> and <em>estimation.pvalue = &ldquo;skewness&rdquo;</em>, it is equivalent to the &ldquo;liu&rdquo; method in the SKAT package, and if <em>estimation.pvalue = &ldquo;kurtosis&rdquo;</em>, it corresponds to the &ldquo;liu.mod&rdquo; method in the SKAT package. If <em>debug = TRUE</em>, the statistics&#39; moments will be returned in addition to the p-values.    </p>
+
+<p>If the sample size is lower than 2000, we recommand to use the sampling procedure. If no covariates are present, a simple permutation procedure can be used (<em>get.moments = &ldquo;permutations&rdquo;</em>), otherwise, a boostrap sampling should be used (<em>get.moments = &ldquo;bootstrap&rdquo;</em>). For those two situations, a sequential procedure is used to compute the p-values: permutated statistics are computed and each one is compared to the observed statistics. The sampling procedure stops when either <em>perm.target</em> (the number of times a permutated statistics should be greater than the observed statistics) or <em>perm.max</em> (the maximum number of permutations to perform) is reached. P-values are then computed in two different ways: if <em>perm.target</em> is reached, the p-value is computed as <em>perm.target</em> divided by the number of permutations performed to reach this value; if <em>perm.max</em> is reached before <em>perm.target</em> (that is, for pretty small p-values), p-values are computed using the chi-square approximation based on moments estimated from the permutated statistics. <em>perm.target</em> and <em>perm.max</em> should be given as a list to the argument <em>params.sampling</em> of SKAT.  </p>
+
+<p>If the sample size is bigger than 2000, the analytical calculation from Liu et al. (2009) can be used to compute the theoretical moments. In this situation, it is possible to parallelise the calculations using the argument <em>cores</em>, set at 10 by default. Nevertheless, this method can take more computation time than the permutation procedures when the sample size is large. We therefore recommend to use one of the permutation procedures to run a first analysis, and then to use the theoretical moments only for the most associated regions.  </p>
+
+<p>It is possible to clearly ask for a specific method to compute the moments using <em>get.moments = &ldquo;permutations&rdquo;</em>, <em>&ldquo;bootstrap&rdquo;</em> or <em>&ldquo;theoretical&rdquo;</em>. By default, <em>get.moments = &ldquo;size.based&rdquo;</em>, and the method will depend on the sample size.   </p>
+
+<p>An example of the SKAT function by specifying the &ldquo;permutations&rdquo; or &ldquo;theoretical&rdquo; method is shown. </p>
+
+<pre><code class="r"># Null model
 x1.null &lt;- NullObject.parameters(x1@ped$pop, RVAT = &quot;SKAT&quot;, pheno.type = &quot;categorial&quot;)
-#Permutations because no covariates
+# Permutations because no covariates
 SKAT(x1, x1.null, get.moments = &quot;permutations&quot;, debug = TRUE,
      params.sampling = list(perm.target = 100, perm.max =5e4))
-#Theoretical on 1 core
+# Theoretical on 1 core
 SKAT(x1, x1.null, get.moments = &quot;theoretical&quot;, debug = TRUE, cores = 1)
 </code></pre>
 
 <p>It is also possible to perform the SKAT test on a continuous phenotype by using the argument <em>pheno.type = &ldquo;continuous&rdquo;</em> in <strong>NullObject.parameters()</strong> before the <strong>SKAT()</strong> function:</p>
 
-<pre><code class="r">#Random continuous phenotype
+<pre><code class="r"># Random continuous phenotype
 set.seed(1) ; pheno1 &lt;- rnorm(nrow(x1))
-#Null Model with covariates
+# Null Model with covariates
 x1.H0.c &lt;- NullObject.parameters(pheno1, RVAT = &quot;SKAT&quot;, pheno.type = &quot;continuous&quot;,
                                  data = covar)
-#Run SKAT
+# Run SKAT
 SKAT(x1, x1.H0.c)
 </code></pre>
 
+<h2>RAVA-FIRST (RAre Variant Analysis using Functionally-InfoRmed STeps)</h2>
+
+<p>Ravages also offers the possibility to analyse rare variants using the &#39;RAVA-FIRST&#39; strategy, composed of three main steps: defining testing units, filtering rare variants, and running functionnaly informed burden tests.</p>
+
+<p>###Definition of testing units: CADD regions
+CADD regions are non-overlapping regions defined genome-wide using the variant pathogenicity score CADD that can be used as testing units: regions are defined between variants observed at least two times in GnomAD with a high CADD score. This CADD score is not the original CADD score v1.4 oublished by Rentzch et al., but an adjusted score that take into account three types of functional categories : coding, regulatory and intergenic categories. This adjusted score enables to find the most important functional variants within each of those three categories. </p>
+
+<p>To attribute adjusted CADD scores to variants, the function <strong>adjustedCADD.annotation()</strong> can be used. It will either annotate variants in the bed matrix using a provided file with adjusted CADD scores to <em>variant.scores</em> (with columns &#39;chr&#39;, &#39;pos&#39;, &#39;A1&#39;, &#39;A2&#39;, &#39;adjCADD&#39;), or by downloading the adjusted scores from <a href="https://lysine.univ-brest.fr/RAVA-FIRST/">https://lysine.univ-brest.fr/RAVA-FIRST/</a> in Ravages repository. </p>
+
+<p>To assign variants to CADD regions and to the functional categories, the function <strong>set.CADDregions()</strong> can be used. It will add <em>genomic.region</em> to the bed matrix with the corresponding CADD regions present in the file &ldquo;CADDRegions.2021.hg19.bed.gz&rdquo; and <em>SubRegion</em> with the functional area present in the file &ldquo;FunctionalAreas.hg19.bed.gz&rdquo;, both directly downloaded from <a href="https://lysine.univ-brest.fr/RAVA-FIRST/">https://lysine.univ-brest.fr/RAVA-FIRST/</a> in the repository from the package Ravages. In addition, <em>adjCADD.Median</em> will be added to <em>x@snps</em> which correspond to the median adjusted CADD score of variants observed at least two times in GnomAD and can be used for variant filtering as explained later.</p>
+
+<pre><code class="r"># Annotation of variants with adjusted CADD scores
+x &lt;- adjustedCADD.annotation(x)
+# Attribution of CADD regions
+x.CADDregions &lt;- set.CADDregions(x)
+</code></pre>
+
+<p>###Filtering of rare variants: region-dependant thresholds
+In RAVA-FIRST, we propose a new approach to select rare variants to include in the RVAT that keeps within each CADD region only the variants with an adjusted CADD score greater than the median observed in GnomAD. To this end, the function <strong>filter.adjustedCADD()</strong> can be used which relies on the same arguments than <strong>filter.rare.variants()</strong> for the frequency parameters. Within this function, SNVs of the bed matrix will be directly annotated with the adjusted CADD scores using the file &ldquo;AdjustedCADD_v1.4_202108.tsv.gz&rdquo; that will be downloaded from <a href="https://lysine.univ-brest.fr/RAVA-FIRST/">https://lysine.univ-brest.fr/RAVA-FIRST/</a> into the repostitoy of the package Ravages or with a provided dataframe <em>variant.scores</em>. If the bed matrix has previously been annotated by <strong>adjustedCADD.annotation()</strong>, <strong>filter.adjustedCADD()</strong> will filter rare variants based on <code>x@snps$adjCADD</code> without annotating the variants to gain in computation time. Only the variants with a score greater than the median will be kept. It is necessary that the bed matrix is first annotated with <strong>set.CADDregion()</strong> to get the median of each variant from its corresponding CADD region. </p>
+
+<pre><code class="r"># Keep only CADD regions with 2 variants and variants with a MAF greater than 1% 
+# and with an adjusted CADD score greater than the median
+x.median &lt;- filter.adjustedCADD(x.CADDregions, maf.threshold = 0.01, min.nb.snps = 2)
+</code></pre>
+
+<p>###Functionally-informed burden tests
+CADD regions can overlap different types of functional categories (coding, regulatory or intergenic regions). To take them into account in RAVA-FIRST, we propose to use the functionally-informed burden test <strong>burden.subscores()</strong> with subscores in the regression, one for each functional category, within each CADD region. There will be at most three sub-scores in the regression. <strong>burden.subscores()</strong> can be directly applied on the bed matrix obtained from <strong>set.CADDregions()</strong> or <strong>filter.adjustedCADD()</strong>.<br/>
+<strong>SKAT()</strong> can also be applied on the bed matrix with variants grouped and filtered according to RAVA-FIRST but it will correspond to the classical SKAT analysis without the integration of functional information. </p>
+
+<pre><code class="r"># Functionally-informed WSS analysis
+x.burden &lt;- burden.subscores(x.median, x1.H0.burden, burden.function = WSS)
+# SKAT analysis
+x.SKAT &lt;- SKAT(x.median, x1.H0.SKAT)
+</code></pre>
+
+<p>###Complete RAVA-FIRST approach and whole-genome analysis
+RAVA-FIRST enables to perform RVAT in the whole genome. To facilitate the analysis, we propose the function <strong>RAVA.FIRST()</strong> which gathers all the previous functions and enables to directly performs the whole RAVA-FIRST strategy on a bed matrix. It simply needs the bed matrix and the NullObject (that can be obtained from <strong>NullObject.parameters()</strong> and should be given to <em>H0.burden</em> and/or <em>H0.SKAT</em>) and optional filtering arguments and parameters for the RVAT previously mentionned. <em>burden.parametrs</em> should be a list containing <em>burden.function</em> and <em>get.effect.size</em> if <em>burden  = TRUE</em> and <em>SKAT.parameters</em> should be a list containing <em>weights</em>, <em>get.moments</em> <em>estimation.pvalue</em>, <em>param.sampling</em> and <em>debug</em> if <em>SKAT = TRUE</em>. If no such list is provided, the default parameters of <strong>burden.subscores()</strong> and <strong>SKAT</strong> will be used. Due to time and memory management, we advise the user to import the data and apply the different functions of annotation, filtering and association (or directly <strong>RAVA.FIRST()</strong>) chromosome by chromosome for large datasets as shown in the example below. </p>
+
+<pre><code class="r"># *** RAVA-FIRST analysis with functionally-informed WSS and SKAT
+#Burden parameters
+burden.parameters &lt;- list(get.effect.size = T, burden.function = WSS)
+# Chromosome by chromosome
+res.bychr &lt;- vector(&quot;list&quot;, 22)
+for(chr in 1:22){
+  x &lt;- read.bed.matrix(paste0(path_file, prefix_vcf, chr, &quot;.vcf.gz&quot;))
+  res.bychr[[chr]] &lt;- RAVA.FIRST(x, H0.burden = H0.burden, H0.SKAT = H0.SKAT,
+                                 burden.parameters = burden.parameters)
+}
+</code></pre>
+
+<p>When using <strong>RAVA-FIRST()</strong>, results of association analysis will be provided for burden and/or SKAT depending on the corresponding arguments. In addition of the results of the test, information about the CADD region will be provided: the positions of the regions, the type of genomic category overlapped by each CADD region, and finally the median of adjusted CADD scores used for the filtering of rare variants.  </p>
+
+<p>To get more information about a specific CADD region of interest, especially about the positions of the genomic categories in this region, the user is advised to directly use the file &ldquo;FunctionalAreas.hg19.bed.gz&rdquo; and the corresponding tabix file in the Ravages repository to look at the positions of the corresponding CADD region. </p>
+
 <h2>Data management</h2>
 
-<p>Data in plink format or in vcf format can be loaded in R using the functions <strong>read.bed.matrix()</strong> and <strong>read.vcf()</strong> respectively from the package gaston.<br/>
-If the data for the controls and the different groups of cases are in different files, they can be loaded separately and then combined using the function <strong>gaston:::rbind()</strong> as long as the same variants are present between the different groups of individuals.<br/>
-An example is given below where the simulated data have been split according the the group of each individual, and then combined in a bed.matrix:</p>
+<p>Data in plink format or in vcf format can be loaded in R using the functions <strong>read.bed.matrix()</strong> and <strong>read.vcf()</strong> respectively from the package gaston.  </p>
 
-<pre><code class="r">#Selection of each group of individuals
+<p>If the data for the controls and the different groups of cases are in different files, they can be loaded separately and then combined using the function <strong>gaston::rbind()</strong> as long as the same variants are present between the different groups of individuals.  </p>
+
+<p>An example is given below where the simulated data have been split according the the group of each individual, and then combined in a bed.matrix:</p>
+
+<pre><code class="r"># Selection of each group of individuals
 CEU &lt;- select.inds(x1, pop==&quot;CEU&quot;)
 CEU
 </code></pre>
@@ -506,7 +632,7 @@ GBR
 ## ped stats are set
 </code></pre>
 
-<pre><code class="r">#Combine in one file:
+<pre><code class="r"># Combine in one file:
 CEU.FIN.GBR &lt;- rbind(CEU, FIN, GBR)
 CEU.FIN.GBR
 </code></pre>

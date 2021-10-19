@@ -1,8 +1,9 @@
-##random.bed.matrix with GRR
-random.bed.matrix <- function(genes.maf = Kryukov, size, prev, replicates, 
-                              GRR.matrix.del, GRR.matrix.pro, p.causal = 0.5, p.protect = 0, 
-                              same.variant=FALSE, 
-                              genetic.model=c("general", "multiplicative", "dominant", "recessive"), select.gene) {
+##rbm with GRR
+rbm.GRR <- function(genes.maf = Kryukov, size, prev, replicates, 
+                    GRR.matrix.del, GRR.matrix.pro = NULL, p.causal = 0.5, p.protect = 0, 
+                    same.variant=FALSE, 
+                    genetic.model=c("general", "multiplicative", "dominant", "recessive"), select.gene,
+                    selected.controls = T, maf.threshold = 0.01) {
   
   if (nlevels(genes.maf$gene) > 1){ 
     if(missing(select.gene)){
@@ -42,7 +43,7 @@ random.bed.matrix <- function(genes.maf = Kryukov, size, prev, replicates,
   }
   
   ##Same for protective
-  if (!missing(GRR.matrix.pro)) {
+  if (!is.null(GRR.matrix.pro)) {
     if (!is.list(GRR.matrix.pro)) {
       if (is.matrix(GRR.matrix.pro)) {
         GRR.matrix.pro <- list(GRR.matrix.pro)
@@ -72,7 +73,7 @@ random.bed.matrix <- function(genes.maf = Kryukov, size, prev, replicates,
   
   ##Check on GRR values
   if (any(GRR.het < 1) | any(GRR.homo.alt < 1)) stop("Matrix of deleterious GRR has GRR values lower than 1")
-  if (!missing(GRR.matrix.pro)) {
+  if (!is.null(GRR.matrix.pro)) {
     if (any(GRR.het.pro > 1) | any(GRR.homo.alt.pro > 1)) stop("Matrix of protective GRR has GRR values greater than 1")
   }
 
@@ -99,6 +100,8 @@ random.bed.matrix <- function(genes.maf = Kryukov, size, prev, replicates,
   GRR.pars$n.variants <- length(pop.maf)
   nb_snps <- GRR.pars$n.variants * replicates
   nb_inds <- sum(size)
+  GRR.pars$maf <- pop.maf
+  GRR.pars$maf.threshold <- maf.threshold
   x <- new.bed.matrix(nb_inds, nb_snps);
   for(b in 1:replicates) {
     GRR.het <- do.call( variant.function, GRR.pars)
@@ -111,7 +114,7 @@ random.bed.matrix <- function(genes.maf = Kryukov, size, prev, replicates,
     }else{
       GRR.homo.alt=NULL
     }    
-    MAFS <- genotypic.freq(genes.maf=genes.maf, GRR.het=GRR.het, GRR.homo.alt=GRR.homo.alt, prev=prev, select.gene=select.gene, genetic.model=genetic.model)
+    MAFS <- genotypic.freq(genes.maf=genes.maf, GRR.het=GRR.het, GRR.homo.alt=GRR.homo.alt, prev=prev, select.gene=select.gene, genetic.model=genetic.model, selected.controls = selected.controls)
   #Check if problems with model
     if(any(MAFS$freq.homo.ref[1,]>1 | MAFS$freq.het[1,]<0 | MAFS$freq.homo.alt[1,]<0)) stop("Impossible genetic model, please change your parametrization")
     .Call("oz_random_filling_bed_matrix_noHW", PACKAGE = "Ravages", x@bed, MAFS$freq.homo.ref, MAFS$freq.het, size, (b-1)*GRR.pars$n.variants)
