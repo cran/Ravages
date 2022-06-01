@@ -29,12 +29,12 @@ table(x1@snps$genomic.region, useNA="ifany")
 # run burden test CAST, using the 1000Genome population as "outcome"
 # Null model for CAST
 x1.H0.burden <- NullObject.parameters(x1@ped$pop, ref.level = "CEU", 
-                                      RVAT = "burden", pheno.type = "categorial")
+                                      RVAT = "burden", pheno.type = "categorical")
 burden(x1, NullObject = x1.H0.burden, burden = "CAST", cores = 1)
 
 # run SKAT, using the 1000Genome population as "outcome"
 # COnstruct null model for SKAT, then run test with only a few permutations
-x1.H0.SKAT <- NullObject.parameters(x1@ped$pop, RVAT = "SKAT", pheno.type = "categorial")
+x1.H0.SKAT <- NullObject.parameters(x1@ped$pop, RVAT = "SKAT", pheno.type = "categorical")
 SKAT(x1, x1.H0.SKAT, params.sampling=list(perm.target = 10, perm.max = 500))
 
 # run a similar analysis but using the RAVA-FIRST approach with WSS
@@ -78,7 +78,7 @@ head(Sum.score)
 ## ---- eval = F----------------------------------------------------------------
 #  # Null model
 #  x1.H0 <- NullObject.parameters(x1@ped$pop, ref.level = "CEU",
-#                                 RVAT = "burden", pheno.type = "categorial")
+#                                 RVAT = "burden", pheno.type = "categorical")
 #  # WSS
 #  burden(x = x1, NullObject = x1.H0, burden ="WSS",
 #        alpha=0.05, get.effect.size=TRUE, cores = 1)
@@ -89,7 +89,7 @@ head(Sum.score)
 #  covar <- cbind(sex, u)
 #  # Null model with the covariate "sex"
 #  x1.H0.covar <- NullObject.parameters(x1@ped$pop, ref.level = "CEU",
-#                                       RVAT = "burden", pheno.type = "categorial",
+#                                       RVAT = "burden", pheno.type = "categorical",
 #                                       data = covar, formula = ~ sex)
 #  
 #  # Regression with the covariate "sex" without OR values
@@ -115,7 +115,7 @@ burden.subscores(x2, x1.H0.burden, cores = 1)
 
 ## ---- eval = F----------------------------------------------------------------
 #  # Null model
-#  x1.null <- NullObject.parameters(x1@ped$pop, RVAT = "SKAT", pheno.type = "categorial")
+#  x1.null <- NullObject.parameters(x1@ped$pop, RVAT = "SKAT", pheno.type = "categorical")
 #  # Permutations because no covariates
 #  SKAT(x1, x1.null, get.moments = "permutations", debug = TRUE,
 #       params.sampling = list(perm.target = 100, perm.max =5e4))
@@ -132,10 +132,10 @@ burden.subscores(x2, x1.H0.burden, cores = 1)
 #  SKAT(x1, x1.H0.c)
 
 ## ---- eval = F----------------------------------------------------------------
-#  # Annotation of variants with adjusted CADD scores
-#  x <- adjustedCADD.annotation(x)
 #  # Attribution of CADD regions
 #  x.CADDregions <- set.CADDregions(x)
+#  # Annotation of variants with adjusted CADD scores
+#  x <- adjustedCADD.annotation(x)
 
 ## ---- eval = FALSE------------------------------------------------------------
 #  # Keep only CADD regions with 2 variants and variants with a MAF greater than 1%

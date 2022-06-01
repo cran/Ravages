@@ -1,5 +1,4 @@
-// with the help of package_native_routine_registration_skeleton(".", "src/ravages_init.c")
-
+// tools::package_native_routine_registration_skeleton("..")
 #include <R.h>
 #include <Rinternals.h>
 #include <stdlib.h> // for NULL
@@ -20,6 +19,8 @@ extern SEXP oz_sum_fst1(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP oz_sum_fst1_max_perm(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP rbm_haplos_freqs(SEXP, SEXP, SEXP, SEXP);
 extern SEXP rbm_haplos_thresholds_filling(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP rvg_skatMoments(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
+extern SEXP rvg_skatStats(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP skat(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 extern SEXP skat_bootstrap(SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP, SEXP);
 
@@ -38,6 +39,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"oz_sum_fst1_max_perm",              (DL_FUNC) &oz_sum_fst1_max_perm,               6},
     {"rbm_haplos_freqs",                  (DL_FUNC) &rbm_haplos_freqs,                   4},
     {"rbm_haplos_thresholds_filling",     (DL_FUNC) &rbm_haplos_thresholds_filling,      9},
+    {"rvg_skatMoments",                   (DL_FUNC) &rvg_skatMoments,                   10},
+    {"rvg_skatStats",                     (DL_FUNC) &rvg_skatStats,                      8},
     {"skat",                              (DL_FUNC) &skat,                               9},
     {"skat_bootstrap",                    (DL_FUNC) &skat_bootstrap,                    10},
     {NULL, NULL, 0}
@@ -48,3 +51,4 @@ void R_init_Ravages(DllInfo *dll)
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }
+
