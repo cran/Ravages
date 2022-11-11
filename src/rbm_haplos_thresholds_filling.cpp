@@ -11,7 +11,7 @@ using namespace Rcpp;
 // sd = l'écart type de la composante E
 // thr1, thr2 = thresholds définissant les différents groupes (longueur K)
 // size un vecteur de tailles (longueur K)
-// repNumber = Num�ro du r�plicat pour remplir la bed matrice 
+// repNumber = Numero du replicat pour remplir la bed matrice 
 // [[Rcpp::export]]
 void rbm_haplos_thresholds_filling(XPtr<matrix4> pA, IntegerMatrix haplos, List burden, NumericVector sd,
                      NumericVector thr1, NumericVector thr2, NumericVector size, int repNumber, int reps) {
@@ -22,12 +22,12 @@ void rbm_haplos_thresholds_filling(XPtr<matrix4> pA, IntegerMatrix haplos, List 
     stop("Dimensions mismatch");
  
   size_t n_diplos = (u * (u+1)) / 2;
-  // pour ne calculer qu'une fois les fréquences diplotypiques dans chaque groupe,
+  // pour ne calculer qu'une fois les frequences diplotypiques dans chaque groupe,
   // première boucle sur les groupes
   int ind = 0; // premier individu du groupe en cours
   for(int k = 0; k < K; k++) {
     haplo_probs Probs(burden[k], sd[k], thr1[k], thr2[k]);
-    NumericVector P(n_diplos); // toutes les freqs diplotypiques (à constante près)
+    NumericVector P(n_diplos); // toutes les freqs diplotypiques (a constante près)
     size_t l = 0;
     for(int i = 0; i < u; i++) {
       for(int j = 0; j <= i; j++) {
@@ -39,14 +39,14 @@ void rbm_haplos_thresholds_filling(XPtr<matrix4> pA, IntegerMatrix haplos, List 
     // La fonction sample commence par "normaliser" P
     // (cf code dans Rcpp/sugar/functions/sample.h)
     IntegerVector DIP = sample(n_diplos, reps*size[k], true, P, false);
-    int d = 0; // numéro de diplotype
+    int d = 0; // numero de diplotype
     for(int rep = 0; rep < reps; rep++) { // replicats
       for(int i = 0; i < size[k]; i++) { // individus
         int h1, h2;   // numero d'haplotypes
         one_to_pair(DIP[d++], h1, h2);
         for(int snp = 0; snp < p; snp++) {
           pA->set(p*reps*repNumber + p*rep + snp, ind + i, haplos(h1,snp) + haplos(h2,snp) );
-          //remplir matrice par r�plicat avec memes fardeaux*snp, puis par replicat en changeant les variants causaux
+          //remplir matrice par replicat avec memes fardeaux*snp, puis par replicat en changeant les variants causaux
         }
       }
     }
