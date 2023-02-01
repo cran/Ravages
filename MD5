@@ -1,11 +1,11 @@
-cdd64d511c9ebd937fc3f9cf5aaee93a *DESCRIPTION
+3e87cf8c005ab6b1267b14d5b90fd9d9 *DESCRIPTION
 0469593ea231cece92cb5e9f8ee6c5a1 *NAMESPACE
-006ed4cb7137360becee967814e0a52f *NEWS.md
+179d517f51b434acd9ab8337c169a7af *NEWS
 8752bf557c39a0d018852f430a5b6603 *R/CAST.r
 0d77e1a1e48806ca4fa24ac9ee53a708 *R/GRR_matrix.r
 298c7d54268c40f1ee48b5e4b775a104 *R/NullObject_parameters.r
 1e215259e657949704e90561e48d6e56 *R/Pi_matrix.r
-82448e639eee3298647df0939bb34ea4 *R/RAVA_FIRST.r
+243e2aaeda3e7d9192b86a0b9a13e008 *R/RAVA_FIRST.r
 6369462750a8c94eb9e5910e599ec6fc *R/SKAT.r
 201e59497e0c7762c643243dd1b33b4b *R/SKAT_NullObject.r
 5fa458a982afff540d42b6ba49de64bc *R/SKAT_bootstrap.r
@@ -26,7 +26,7 @@ c452738276ac4b20308a2009683cb355 *R/burden_mlogit.r
 61e82dc331cc21f630c48e8150192e76 *R/burden_mlogit_subscores.r
 abf1ef60da5a1e6560084631c92c1267 *R/burden_subscores.r
 223cf3dbe12f793678c029af02edcc31 *R/burden_weighted_matrix.r
-887dbdd7f9da585629d56786f1744352 *R/filter_adjustedCADD.r
+c2a7619bc6be44768fe190cbaf6257c6 *R/filter_adjustedCADD.r
 b2ebdba819278f868517b6e9d9219eec *R/filter_rare_variants.r
 6c059f9fae805a0c3a7fe529317a8dae *R/genotypic.freq.r
 a0b433767b908160910e003f564841ab *R/get_parameters_pvalue_theoretical.r
@@ -61,10 +61,10 @@ b94ad977a7ee163872e4aeb4b743d598 *data/genes.b37.RData
 6c16748a7e5558979c8051b1122013ff *data/genes.b38.RData
 a9d5afbe4c6129511e212c80b61714c9 *inst/doc/Ravages_Simulations_vignette.R
 edd3f73a3f2215dbed861204985d1d8a *inst/doc/Ravages_Simulations_vignette.Rmd
-2a5b65c18c11997b8697ab6c078b9d71 *inst/doc/Ravages_Simulations_vignette.pdf
+d68e6df54e6128fae66f91bebad208d9 *inst/doc/Ravages_Simulations_vignette.pdf
 fa41c0406d90518ff58e9ef5b18fe8f2 *inst/doc/Ravages_vignette.R
 e7387ae6fcd2603ed9ac024f76452973 *inst/doc/Ravages_vignette.Rmd
-3fbdb7fced7d9f6509e26b3584ff79ec *inst/doc/Ravages_vignette.pdf
+5139a027b0168eae8e03b3a9f7f58429 *inst/doc/Ravages_vignette.pdf
 b82cb78aa0a2243f64b4de6362fa2e71 *man/CAST.Rd
 499a5c44dd2b4e9e21770cce16c935c4 *man/GRR.matrix.Rd
 e748dc50139dd96bde42c8d8d083d022 *man/GnomADgenes.Rd
@@ -73,7 +73,7 @@ d660c513320d9562d821256a0ae357ee *man/Kryukov.Rd
 4be76925906e74eb7f089ffb84e182b9 *man/LCT.haplotypes.Rd
 da0c83dd3c935c389cd9c8e0c4fdc83c *man/LCT.matrix.Rd
 83d9ed42be7e4417ccc06c7d03c8e219 *man/NullObject.parameters.Rd
-fabfcf402cd1215f0a21f740907b0bf8 *man/RAVA_FIRST.Rd
+c6f8028b794abed1d87efe33a3fce64b *man/RAVA_FIRST.Rd
 7f1c1d63ff52f7fbf8586850e47a5737 *man/SKAT.Rd
 db847b1e8db0712405bdc5c450ab68f2 *man/SKAT.bootstrap.Rd
 d5cdce206723063576371e34a1fdad74 *man/SKAT.continuous.Rd
@@ -92,7 +92,7 @@ e11243cb83c6ff58df89c7e1ad18eb62 *man/burden.continuous.Rd
 51f47aa378b3e6fcd783c7f7e097b653 *man/burden.subscores.Rd
 5da392b12bf99a955bcfded444b1fa92 *man/burden.weighted.matrix.Rd
 2e42462efc51c6db8a496ba4968464d7 *man/filter.rare.variants.Rd
-645eae0a71e135f9fc55495085b296da *man/filter_adjustedCADD.Rd
+19fcf2cd29bb162476cc0e3258bf8be0 *man/filter_adjustedCADD.Rd
 7c00bab3f7fd3d8abe2b5ba25f65460d *man/genes.positions.Rd
 2d9607aee662f9abb71754a6982379f2 *man/genotypic.freq.Rd
 e51096d8a9831f77e9e4dea93821d989 *man/multinomial.asso.freq.Rd
@@ -108,8 +108,8 @@ bd37b7981f26bfbc499d69362af9f0c0 *man/subregions.LCT.Rd
 5e4c40bc12afdf043205dfb3dab137c4 *src/GPG.cpp
 f846ad59efafd269177798f6a252a67d *src/GPG.h
 2bc6951a4c63eab9224bde7571c0d5de *src/GPG2.cpp
-81beb60f26a702e7dd487477a1b6328a *src/Makevars
-e3d3cb360fbfdb3c6974e14eb5f09870 *src/Makevars.win
+435a457703fdd800b7809987954162d6 *src/Makevars
+55b199b1036d8b84d504a507305363a7 *src/Makevars.win
 866cabc91895020cdd6ef7e382a0320e *src/allelecounter.cpp
 fa91d4aebf30b27a7adc7cecaf4a89b7 *src/allelecounter.h
 d630639a623d4b5395b5c9c607bb8a20 *src/allelecounter2.cpp
@@ -132,7 +132,7 @@ a6fb36654d733f0eef09183395eb45c6 *src/random_bed_matrix.cpp
 c5ac56f260c645b39c4a0b57afe542ec *src/ravages_init.c
 b4748b063afe4c4de3779b7fa355e1c9 *src/rbm_haplos_freqs.cpp
 481e7db3961eced6e49127ecc9b2278d *src/rbm_haplos_thresholds.cpp
-007e4a01d08c8655be370e2de8df7c8f *src/rbm_haplos_thresholds_filling.cpp
+1fb28747b6c571993e23ac97ad79ce1d *src/rbm_haplos_thresholds_filling.cpp
 f6729ce16cf5df0d63ee3814752cdcd8 *src/skat.cpp
 7ee3a3ccb84cb826a5fb53c1c84ce309 *src/skatBootstrap.cpp
 387e6cb5edc219cee1152843d61c0400 *src/skatMoments.cpp
