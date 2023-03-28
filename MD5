@@ -1,4 +1,4 @@
-3e87cf8c005ab6b1267b14d5b90fd9d9 *DESCRIPTION
+a20a83974bbd5874320a8f3f886f3e15 *DESCRIPTION
 0469593ea231cece92cb5e9f8ee6c5a1 *NAMESPACE
 179d517f51b434acd9ab8337c169a7af *NEWS
 8752bf557c39a0d018852f430a5b6603 *R/CAST.r
@@ -38,7 +38,7 @@ b47b27f2ecab35e9c464cb529559f8f9 *R/multinomial.asso.freq.r
 c6fd697e7c7de0e11ec002b39d3cf22f *R/new_bed_matrix.r
 a7ec73c922f623e953bde27c1eb2d73a *R/or_matrix_fix.r
 90c224a0fd44c4982ad5d872b061797d *R/or_matrix_fix_same_variant.r
-b9361ab4ef642d155b8ad54cb460487b *R/p_valeur_moments_liu.r
+7bbd5134b250bc23b2e7833e910956e7 *R/p_valeur_moments_liu.r
 ab42e5e894c04d9c5bd619157bb21675 *R/random_bed_matrix_freqs.r
 43c691547e215649f6f1c883683b05ec *R/random_bed_matrix_haplo.r
 56e940e5ff8e97ac2114dfd6ce1504ec *R/rbm_GRR.r
@@ -61,10 +61,10 @@ b94ad977a7ee163872e4aeb4b743d598 *data/genes.b37.RData
 6c16748a7e5558979c8051b1122013ff *data/genes.b38.RData
 a9d5afbe4c6129511e212c80b61714c9 *inst/doc/Ravages_Simulations_vignette.R
 edd3f73a3f2215dbed861204985d1d8a *inst/doc/Ravages_Simulations_vignette.Rmd
-d68e6df54e6128fae66f91bebad208d9 *inst/doc/Ravages_Simulations_vignette.pdf
+9ab21f69f8ad016194f360367941f461 *inst/doc/Ravages_Simulations_vignette.pdf
 fa41c0406d90518ff58e9ef5b18fe8f2 *inst/doc/Ravages_vignette.R
 e7387ae6fcd2603ed9ac024f76452973 *inst/doc/Ravages_vignette.Rmd
-5139a027b0168eae8e03b3a9f7f58429 *inst/doc/Ravages_vignette.pdf
+abb72d08d2e5784f854d07a79ec9b7dc *inst/doc/Ravages_vignette.pdf
 b82cb78aa0a2243f64b4de6362fa2e71 *man/CAST.Rd
 499a5c44dd2b4e9e21770cce16c935c4 *man/GRR.matrix.Rd
 e748dc50139dd96bde42c8d8d083d022 *man/GnomADgenes.Rd
