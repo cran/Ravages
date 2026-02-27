@@ -21,14 +21,15 @@ For variant \emph{i} and individual \emph{j}, the genetic score will be computed
 \seealso{ \code{\link{CAST}}, \code{\link{WSS}}, \code{\link{burden.mlogit}} }
 \examples{
 #Import data in a bed matrix
-x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
+x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
-# Group variants within known genes
+#Group variants within known genes
 x <- set.genomic.region(x)
 
-# Filter variants with maf (computed on whole sample) < 0.025
-# keeping only genomic region with at least 10 SNPs
-x1 <- filter.rare.variants(x, filter = "whole", maf.threshold = 0.025, min.nb.snps = 10)
+#Filter of rare variants: only non-monomorphic variants with
+#a MAF lower than 2.5%
+#keeping only genomic regions with at least 200 SNP
+x1 <- filter.rare.variants(x, filter = "whole", maf.threshold = 0.025, min.nb.snps = 200)
 
 #Compute burden score with weights = 1-maf
 score.burden <- burden.weighted.matrix(x1, weights=1-x1@snps$maf)

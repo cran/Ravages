@@ -44,15 +44,8 @@ burden.mlogit(x, NullObject, genomic.region = x@snps$genomic.region, burden,
 \seealso{ \code{\link{NullObject.parameters}}, \code{\link{CAST}}, \code{\link{WSS}}, \code{\link{burden.weighted.matrix}} }
 \references{ Bocher O, et al. DOI: 10.1002/gepi.22210. \emph{Rare variant associationtesting for multicategory phenotype.} Genet.Epidemiol. 2019;43:646–656.}
 \examples{
-#Import data in a bed matrix
-x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
-
-#Add population
-x@ped[,c("pop", "superpop")] <- LCT.matrix.pop1000G[,c("population", "super.population")]
-
-#Select EUR superpopulation
-x <- select.inds(x, superpop=="EUR")
-x@ped$pop <- droplevels(x@ped$pop)
+#Import data in a bed matrix 
+x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
 #Group variants within known genes
 x <- set.genomic.region(x)
@@ -62,14 +55,13 @@ x <- set.genomic.region(x)
 #keeping only genomic regions with at least 200 SNP
 x1 <- filter.rare.variants(x, filter = "whole", maf.threshold = 0.025, min.nb.snps = 200)
 
-#Simulation of a covariate + Sex as a covariate
-sex <- x1@ped$sex
-set.seed(1) ; u <- runif(nrow(x1))
+#Simulation of a continuous and a binary covariate
+set.seed(1) ; sex <- sample(0:1, nrow(x1), replace = TRUE) ;  u <- runif(nrow(x1))
 covar <- cbind(sex, u)
               
 #run null model, using the 1000Genome population as "outcome"
 #Null model with the covariate sex
-x1.H0.covar <- NullObject.parameters(pheno = x1@ped$pop, ref.level = "CEU", 
+x1.H0.covar <- NullObject.parameters(pheno = x1@ped$population, ref.level = "CEU", 
                                      RVAT = "burden", pheno.type = "categorical",
                                      data = covar, formula = ~ sex)
 #WSS test

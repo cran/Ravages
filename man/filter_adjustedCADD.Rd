@@ -12,7 +12,8 @@ filter.adjustedCADD(x, SNVs.scores = NULL, indels.scores = NULL,
                     filter=c("whole", "controls", "any"), 
                     maf.threshold=0.01, min.nb.snps = 2, 
                     min.cumulative.maf = NULL, 
-                    group = NULL, cores = 10, path.data, verbose = T)
+                    group = NULL, cores = 10, path.data, verbose = T,
+                    build = c("b37", "b38"))
 }
 \arguments{
   \item{x}{ A bed.matrix annotated with CADD regions using \code{set.CADDregions} }
@@ -27,7 +28,7 @@ filter.adjustedCADD(x, SNVs.scores = NULL, indels.scores = NULL,
   \item{cores}{ How many cores to use, set at 10 by default}
   \item{path.data}{ The repository where data for RAVA-FIRST are or will be downloaded from https://lysine.univ-brest.fr/RAVA-FIRST/}
   \item{verbose}{ Whether to display information about the function actions }
-  
+  \item{build}{The build of the data, either "b37" or "b38". The CADD Regions in the corresponding build will be considered}  
 }
 \value{
   A bed.matrix with filtered variants
@@ -54,14 +55,14 @@ filter.adjustedCADD(x, SNVs.scores = NULL, indels.scores = NULL,
  \code{\link{RAVA.FIRST}}, \code{\link{set.CADDregions}}, \code{\link{burden.subscores}}, \code{\link{filter.rare.variants} }
 }
 \examples{
-#Import 1000Genome data from region around LCT gene
-#x <- as.bed.matrix(LCT.gen, LCT.fam, LCT.bim)
+#Import 1000Genome data from region around LCT gene (b37)
+#x37 <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
 #Group variants within CADD regions and genomic categories
-#x <- set.CADDregions(x)
+#x <- set.CADDregions(x, build = "b37")
 
 #Annotate variants with adjusted CADD score
 #and filter on frequency and median
 #x.median <- filter.adjustedCADD(x, maf.threshold = 0.025, 
-#                                min.nb.snps = 2)
+#                                min.nb.snps = 2, build = "b37")
 }

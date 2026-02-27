@@ -30,16 +30,12 @@ multinomial.asso.freq(x, pheno = x@ped$pheno, ref.level,
 }
 \examples{
 #Import data in a bed matrix
-x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
+x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
-#Add population
-x@ped[,c("pop", "superpop")] <- LCT.matrix.pop1000G[,c("population", "super.population")]
-
-#Select EUR superpopulation
-x <- select.inds(x, superpop=="EUR")
-x@ped$pop <- droplevels(x@ped$pop)
+#Group variants within known genes
+x <- set.genomic.region(x)
 
 #Perform association test
 x.freq.asso <- multinomial.asso.freq(x, test = "Genotypic",
-                                     pheno = x@ped$pop)
+                                     pheno = x@ped$population)
 }

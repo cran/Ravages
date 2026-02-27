@@ -33,8 +33,8 @@ The same bed matrix as x with two additional columns: \code{x@snps$genomic.regio
  \code{\link{set.genomic.region}}, \code{\link{burden.subscores}}
 }
 \examples{
-#Import 1000Genome data from region around LCT gene
-x <- as.bed.matrix(LCT.gen, LCT.fam, LCT.bim)
+#Import data in a bed matrix
+x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
 #Group variants within known genes and 
 #Within coding and regulatory regions

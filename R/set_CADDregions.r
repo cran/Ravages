@@ -1,21 +1,52 @@
-set.CADDregions <- function(x, verbose = T, path.data) {
+set.CADDregions <- function(x, verbose = T, path.data, build = c("b37", "b38")) {
+  #Check the chromosomes names in the bed matrix
+  if(all(is.na(x@snps$chr))){ stop("All chromomsome names are unknown, CADD regions can't be attributed, please consider setting convert.chr = F if read.vcf() was used") }
+  #Replace the chromosome names if starting with 'chr'
+  if(any(grepl(x@snps$chr, pattern = "chr"))){
+    cat("Chromosome names contain 'chr' which will be removed")
+    x@snps$chr <- as.numeric(gsub(x@snps$chr, pattern = 'chr', replacement = ''))
+  }  
+
   if(missing(path.data)) stop("the directory 'path.data' to download and use the necessary files for RAVA-FIRST analysis should be provided")
   ##Check if file with score already downloaded
   if(!file.exists(paste0(path.data, "/README_RAVAFIRST"))) curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/README_RAVAFIRST", destfile = paste0(path.data, "/README_RAVAFIRST")) #download README
-  if(!file.exists(paste0(path.data, "/CADDRegions.202204.hg19.bed.gz"))){
-    if(verbose) cat("Downloading CADD regions in ", path.data, "\n")
-    curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/CADDRegions.202204.hg19.bed.gz", destfile = paste0(path.data, "/CADDRegions.202204.hg19.bed.gz"))
-    curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/CADDRegions.202204.hg19.bed.gz.tbi", destfile = paste0(path.data, "/CADDRegions.202204.hg19.bed.gz.tbi"))
+  if(!(build %in% c("b37", "b38"))) {stop("Wrong build provided")}
+  if(build == "b37"){
+    if(!file.exists(paste0(path.data, "/CADDRegions.202204.hg19.bed.gz"))){
+      if(verbose) cat("Downloading CADD regions in ", path.data, "\n")
+      curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/CADDRegions.202204.hg19.bed.gz", destfile = paste0(path.data, "/CADDRegions.202204.hg19.bed.gz"))
+      curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/CADDRegions.202204.hg19.bed.gz.tbi", destfile = paste0(path.data, "/CADDRegions.202204.hg19.bed.gz.tbi"))
+    }
+    if(!file.exists(paste0(path.data, "/FunctionalAreas.hg19.bed.gz"))){
+      if(verbose) cat("Downloading Genomic Categories in ", path.data, "\n")
+      curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/FunctionalAreas.hg19.bed.gz", destfile = paste0(path.data, "/FunctionalAreas.hg19.bed.gz"))
+      curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/FunctionalAreas.hg19.bed.gz.tbi", destfile = paste0(path.data, "/FunctionalAreas.hg19.bed.gz.tbi"))
+    }
   }
-  if(!file.exists(paste0(path.data, "/FunctionalAreas.hg19.bed.gz"))){
-    if(verbose) cat("Downloading Genomic Categories in ", path.data, "\n")
-    curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/FunctionalAreas.hg19.bed.gz", destfile = paste0(path.data, "/FunctionalAreas.hg19.bed.gz"))
-    curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/FunctionalAreas.hg19.bed.gz.tbi", destfile = paste0(path.data, "/FunctionalAreas.hg19.bed.gz.tbi"))
+  if(build == "b38"){
+    if(!file.exists(paste0(path.data, "/CADDRegions.202602.b38.bed.gz"))){
+      if(verbose) cat("Downloading CADD regions in ", path.data, "\n")
+      curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/CADDRegions.202602.b38.bed.gz", destfile = paste0(path.data, "/CADDRegions.202602.b38.bed.gz"))
+      curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/CADDRegions.202602.b38.bed.gz.tbi", destfile = paste0(path.data, "/CADDRegions.202602.b38.bed.gz.tbi"))
+    }
+    if(!file.exists(paste0(path.data, "/FunctionalAreas.b38.SCREENv3.bed.gz"))){
+      if(verbose) cat("Downloading Genomic Categories in ", path.data, "\n")
+      curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/FunctionalAreas.b38.SCREENv3.bed.gz", destfile = paste0(path.data, "/FunctionalAreas.b38.SCREENv3.bed.gz"))
+      curl_download("https://lysine.univ-brest.fr/RAVA-FIRST/FunctionalAreas.b38.SCREENv3.bed.gz.tbi", destfile = paste0(path.data, "/FunctionalAreas.b38.SCREENv3.bed.gz.tbi"))
+    }
   }
 
-  regions <- read.table(gzfile(paste0(path.data, "/CADDRegions.202204.hg19.bed.gz")), header = T, as.is = T)
+  if(build=="b37"){
+    regions <- read.table(gzfile(paste0(path.data, "/CADDRegions.202204.hg19.bed.gz")), header = T, as.is = T)
+    subregions <- read.table(gzfile(paste0(path.data, "/FunctionalAreas.hg19.bed.gz")), header = T, as.is = T)
+  }
+  if(build=="b38"){
+    regions <- read.table(gzfile(paste0(path.data, "/CADDRegions.202602.b38.bed.gz")), header = T, as.is = T)
+    #Remove "chr" from the chromosome names of the CADD Regions
+    regions$Chr <- as.integer(gsub(regions$Chr, pattern = "chr", replacement = ""))
+    subregions <- read.table(gzfile(paste0(path.data, "/FunctionalAreas.b38.SCREENv3.bed.gz")), header = T, as.is = T)
+  }
   regions$Name <- factor(regions$Name, levels = unique(regions$Name))
-  subregions <- read.table(gzfile(paste0(path.data, "/FunctionalAreas.hg19.bed.gz")), header = T, as.is = T)
 
   #Add one to start to take into account bed format
   regions$Start <- regions$Start+1

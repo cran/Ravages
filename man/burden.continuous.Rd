@@ -38,22 +38,15 @@
 \seealso{ \code{\link{CAST}}, \code{\link{WSS}}, \code{\link{burden.weighted.matrix}} }
 \examples{
 #Import data in a bed matrix
-x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
-
-#Add population
-x@ped[,c("pop", "superpop")] <- LCT.matrix.pop1000G[,c("population", "super.population")]
-
-#Select EUR superpopulation
-x <- select.inds(x, superpop=="EUR")
-x@ped$pop <- droplevels(x@ped$pop)
+x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
 #Group variants within known genes
 x <- set.genomic.region(x)
 
 #Filter of rare variants: only non-monomorphic variants with
 #a MAF lower than 2.5%
-#keeping only genomic regions with at least 10 SNPs
-x1 <- filter.rare.variants(x, filter = "whole", maf.threshold = 0.025, min.nb.snps = 10)
+#keeping only genomic regions with at least 200 SNP
+x1 <- filter.rare.variants(x, filter = "whole", maf.threshold = 0.025, min.nb.snps = 200)
 
 #run burden test WSS, using a random continuous variable as phenotype
 x1@ped$pheno <- rnorm(nrow(x1))

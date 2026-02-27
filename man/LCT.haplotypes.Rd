@@ -25,8 +25,6 @@
 
 \source{ Data were obtained from the 1000 Genomes Project. }
 
-\seealso{ \code{\link{LCT.matrix}} }
-
 \references{ McVean et al, 2012, \emph{An integrated map of genetic variation from 1,092 human genomes}, Nature \bold{491, 56-65} doi:10.1038/nature11632 }
 
 

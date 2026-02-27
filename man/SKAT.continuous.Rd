@@ -37,20 +37,14 @@ If \code{debug = TRUE}, the mean, standard deviation, skewness and kurtosis used
 \examples{
 \donttest{
 #Import data in a bed matrix
-x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
-#Add population
-x@ped[,c("pop", "superpop")] <- LCT.matrix.pop1000G[,c("population", "super.population")]
-
-#Select EUR superpopulation
-x <- select.inds(x, superpop=="EUR")
-x@ped$pop <- droplevels(x@ped$pop)
+x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
 #Group variants within known genes
 x <- set.genomic.region(x)
 
 #Filter of rare variants: only non-monomorphic variants with
 #a MAF lower than 2.5%
-#keeping only genomic regions with at least 10 SNPs
+#keeping only genomic regions with at least 10 SNP
 x1 <- filter.rare.variants(x, filter = "whole", maf.threshold = 0.025, min.nb.snps = 10)
 
 #run SKAT using a random continuous phenotype

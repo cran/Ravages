@@ -24,7 +24,7 @@ burden.NullObject <- function(group, ref.level, data, formula){
     data <- cbind(ind.pheno = group, data)
     data.reg <- dfidx(data, varying = NULL, shape = "wide", choice = "ind.pheno")
     ##Faire tourner le modele
-    LogLik <- as.numeric(summary(mlogit(my.formula, data = data.reg, reflevel = ref.level))$logLik)
+    LogLik <- as.numeric(summary(mlogit(my.formula, data = data.reg, reflevel = ref.level))$logLik[3])
     
   }
   

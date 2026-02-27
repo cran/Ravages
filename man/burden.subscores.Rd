@@ -52,26 +52,20 @@ burden.subscores(x, NullObject, genomic.region = x@snps$genomic.region,
 
 \seealso{\code{\link{RAVA.FIRST}}, \code{\link{NullObject.parameters}}, \code{\link{burden.continuous.subscores}}, \code{\link{burden.mlogit.subscores}},  \code{\link{CAST}}, \code{\link{WSS}}}
 \examples{
-#Import 1000Genome data from region around LCT gene
-x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
+#Import data in a bed matrix
+x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
 #Group variants within known genes and
 #Within coding and regulatory regions
 x <- set.genomic.region.subregion(x, regions = genes.b37, 
                                   subregions = subregions.LCT)
 
-#Add population
-x@ped[,c("pop", "superpop")] <- LCT.matrix.pop1000G[,c("population", "super.population")]
-
-#Select EUR superpopulation
-x <- select.inds(x, superpop=="EUR")
-x@ped$pop <- droplevels(x@ped$pop)
 
 #Keep only variants with a MAF lower than 1%
 x1 <- filter.rare.variants(x, filter = "whole", maf.threshold = 0.01)
 
 #run null model, using the 1000Genome population as "outcome"
-x1.H0 <- NullObject.parameters(pheno = x1@ped$pop, ref.level = "CEU",
+x1.H0 <- NullObject.parameters(pheno = x1@ped$population, ref.level = "CEU",
                                RVAT = "burden", pheno.type = "categorical")
 
 #run functionally-informed burden test WSS in LCT
@@ -80,9 +74,9 @@ burden.subscores(select.snps(x1, genomic.region == "LCT"),
                  get.effect.size=FALSE, cores = 1)
 
 
-####Using the RAVA-FIRST approach with CDD regions
+####Using the RAVA-FIRST approach with CADD regions (example on b37)
 #Group variants within CADD regions and genomic categories
-#x <- set.CADDregions(x)
+#x <- set.CADDregions(x, build = "b37")
 
 #Filter of rare variants: only non-monomorphic variants with
 #a MAF lower than 2.5%

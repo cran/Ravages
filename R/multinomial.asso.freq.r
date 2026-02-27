@@ -12,7 +12,7 @@ multinomial.asso.freq <- function(x, pheno = x@ped$pheno, ref.level, test = c("G
   if(test == "Genotypic"){
     counts.bygroups <- do.call(cbind, sapply(levels(pheno), function(z) select.inds(x, pheno == z)@snps[,c("N0", "N1", "N2")]))
     pval <- data.frame(chr = x@snps$chr, pos = x@snps$pos, p.value = sapply(1:nrow(counts.bygroups), function(z) suppressWarnings(chisq.test(matrix(as.numeric(counts.bygroups[z,]), nrow = nlevels(pheno), ncol = 3, byrow = T))$p.value)))
-    rownames(pval) <- x@snps$id
+    rownames(pval) <- ifelse(x@snps$id==".", paste0(x@snps$chr, ":", x@snps$pos), x@snps$id)
     #Compute OR: one for each genotype comparing to A1A1
     if(get.effect.size){ 
       OR <- lapply( 1:(nlevels(pheno)-1), function(gpe){ res.OR <- t(sapply(1:nrow(counts.bygroups), function(z) matrix(c((counts.bygroups[z,1]*counts.bygroups[z,3*gpe+2])/(counts.bygroups[z,2]*counts.bygroups[z,3*gpe+1]), (counts.bygroups[z,1]*counts.bygroups[z,3*gpe+3])/(counts.bygroups[z,3]*counts.bygroups[z,3*gpe+1])), ncol = 2))) ; rownames(res.OR) <- x@snps$id ; colnames(res.OR) <- c("Hetero", "Homo_alt") ; return(res.OR) } )

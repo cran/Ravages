@@ -5,12 +5,13 @@
 Attributes CADD regions and genomic categories to variants based on their positions
 }
 \usage{
-set.CADDregions(x, verbose = T, path.data)
+set.CADDregions(x, verbose = T, path.data, build = c("b37", "b38"))
 }
 \arguments{
   \item{x}{ A bed.matrix }
   \item{verbose}{ Whether to display information about the function actions }
   \item{path.data}{ The repository where data for RAVA-FIRST are or will be downloaded from https://lysine.univ-brest.fr/RAVA-FIRST/}
+  \item{build}{The build of the data, either "b37" or "b38". The CADD Regions in the corresponding build will be considered}
 }
 \details{
   To attribute variants to CADD regions and genomic categories, the files "CADDRegions.2021.hg19.bed.gz" and "FunctionalAreas.hg19.bed.gz" will be downloaded from https://lysine.univ-brest.fr/RAVA-FIRST/ in the repository of the package Ravages.  
@@ -28,11 +29,11 @@ The same bed matrix as x with three additional columns :
  \code{\link{RAVA.FIRST}}, \code{\link{filter.adjustedCADD}}, \code{\link{burden.subscores}}
 }
 \examples{
-#Import 1000Genome data from region around LCT gene
-#x <- as.bed.matrix(LCT.gen, LCT.fam, LCT.bim)
+#Import data in a bed matrix (example in build 37)
+#x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
 #Group variants within CADD regions and genomic categories
-#x <- set.CADDregions(x)
+#x <- set.CADDregions(x, build = "b37")
 #table(x@snps$genomic.region) #CADD regions
 #table(x@snps$SubRegion) #Genomic categories
 }

@@ -53,25 +53,18 @@ burden(x, NullObject, genomic.region = x@snps$genomic.region, burden,
 \references{ Bocher O, et al. DOI: 10.1002/gepi.22210. \emph{Rare variant association testing for multicategory phenotype.} Genet.Epidemiol. 2019;43:646–656.}
 \examples{
 #Import data in a bed matrix
-x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
-
-#Add population
-x@ped[,c("pop", "superpop")] <- LCT.matrix.pop1000G[,c("population", "super.population")]
-
-#Select EUR superpopulation
-x <- select.inds(x, superpop=="EUR")
-x@ped$pop <- droplevels(x@ped$pop)
+x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
 #Group variants within known genes
 x <- set.genomic.region(x)
 
 #Filter of rare variants: only non-monomorphic variants with
 #a MAF lower than 2.5%
-#keeping only genomic regions with at least 10 SNPs
-x1 <- filter.rare.variants(x, filter = "whole", maf.threshold = 0.025, min.nb.snps = 10)
+#keeping only genomic regions with at least 200 SNP
+x1 <- filter.rare.variants(x, filter = "whole", maf.threshold = 0.025, min.nb.snps = 200)
 
 #run null model, using the 1000Genome population as "outcome"
-x1.H0 <- NullObject.parameters(pheno = x1@ped$pop, ref.level = "CEU",
+x1.H0 <- NullObject.parameters(pheno = x1@ped$population, ref.level = "CEU",
                                RVAT = "burden", pheno.type = "categorical")
 
 #run burden test WSS

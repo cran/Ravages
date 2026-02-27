@@ -32,7 +32,7 @@
   \item{alpha}{ The significance level to compute the power}
   \item{RVAT}{ On which RVAT among 'CAST', 'WSS' and 'SKAT' to compute power (only needed if \code{power.type="simulations"} }
   \item{SKAT.method}{ Which method to use to compute SKAT ppower, i.e. permutations or theoretical moments (cf \code{SKAT} documentation)}
-  \item{simus.haplos}{ Which method to simulate the data, if \code{simus.haplos="freqs"}, {rbm.haplos.freqs()} is used, otherwise \code{rbm.haplos.thresholds()} is used.}
+  \item{simus.haplos}{ Which method to simulate the data, if \code{simus.haplos="freqs"}, \code{rbm.haplos.freqs()} is used, otherwise \code{rbm.haplos.thresholds()} is used.}
   \item{replicates}{ The number of simulations to perform to estimate the power}
   \item{rep.by.causal}{ The number of time causal variants will be sampled}
   \item{cores}{ How many cores to use for moments computation, set at 10 by default }
@@ -45,6 +45,7 @@
   Variants are filtered after the simulations to keep only the rare ones, defined by \code{maf.filter}. By defaut, it corresponds to \code{max.maf.causal} is used. To disable this filter, set \code{maf.filter} at 0.5.
 }
 \examples{
+
 \donttest{
   #Simulations of 5 groups of individuals with haplotypes frequencies
   #from the 5 EUR populations

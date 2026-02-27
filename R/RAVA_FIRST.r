@@ -1,4 +1,4 @@
-RAVA.FIRST <- function(x, SNVs.scores = NULL, indels.scores = NULL, ref.level, filter = c("whole", "controls", "any"), maf.threshold = 0.01, min.nb.snps = 2, min.cumulative.maf = NULL, group = NULL, cores = 10, burden = TRUE, H0.burden, burden.parameters, SKAT = TRUE, H0.SKAT, SKAT.parameters, verbose = TRUE, path.data){
+RAVA.FIRST <- function(x, SNVs.scores = NULL, indels.scores = NULL, ref.level, filter = c("whole", "controls", "any"), maf.threshold = 0.01, min.nb.snps = 2, min.cumulative.maf = NULL, group = NULL, cores = 10, burden = TRUE, H0.burden, burden.parameters, SKAT = TRUE, H0.SKAT, SKAT.parameters, verbose = TRUE, path.data, build = c("b37", "b38")){
   ##Check if good paramters for RVAT are given
   if(burden & missing(H0.burden)) stop("'H0.burden should be given if 'burden = TRUE' and can be obtained using 'NullObject.parameters()'")
   if(SKAT & missing(H0.SKAT))  stop("'H0.SKAT should be given if 'SKAT = TRUE' and can be obtained using 'NullObject.parameters()'")
@@ -6,14 +6,21 @@ RAVA.FIRST <- function(x, SNVs.scores = NULL, indels.scores = NULL, ref.level, f
   ###Attribute CADD regions to variants
   if(verbose) cat("Attribution of CADD regions\n")
   if(missing(path.data)) stop("the directory 'path.data' to download and use the necessary files for RAVA-FIRST analysis should be provided")
-  x <- set.CADDregions(x, path.data = path.data)
+  x <- set.CADDregions(x, path.data = path.data, build = build)
   
   #Importation of CADD regions to give position information in final results
-  regions <- read.table(gzfile(paste0(path.data, "/CADDRegions.202204.hg19.bed.gz")), header = T, as.is = T)
+  if(!(build %in% c("b37", "b38"))) {stop("Wrong build provided")}
+  else{
+    if(build == "b37"){
+      regions <- read.table(gzfile(paste0(path.data, "/CADDRegions.202204.hg19.bed.gz")), header = T, as.is = T)
+    }else{
+      regions <- read.table(gzfile(paste0(path.data, "/CADDRegions.202602.b38.bed.gz")), header = T, as.is = T)
+    }
+  }
   rownames(regions) <- regions$Name
   
   ###Filtering based on CADD scores
-  x.filter <- filter.adjustedCADD(x, SNVs.scores = SNVs.scores, indels.scores = indels.scores, ref.level = ref.level, filter = filter, maf.threshold = maf.threshold, min.nb.snps = min.nb.snps, min.cumulative.maf = min.cumulative.maf, group = group, path.data = path.data, verbose = verbose)
+  x.filter <- filter.adjustedCADD(x, SNVs.scores = SNVs.scores, indels.scores = indels.scores, ref.level = ref.level, filter = filter, maf.threshold = maf.threshold, min.nb.snps = min.nb.snps, min.cumulative.maf = min.cumulative.maf, group = group, path.data = path.data, verbose = verbose, cores = cores, build = build)
   if(verbose) cat("Filtering of rare variants within CADD regions\n")
   ###Association
   if(burden){

@@ -40,26 +40,18 @@ burden.continuous.subscores(x, NullObject, genomic.region = x@snps$genomic.regio
 \seealso{ \code{\link{NullObject.parameters}}, \code{\link{burden.subscores}},  \code{\link{CAST}}, \code{\link{WSS}}}
 \examples{
 #Import data in a bed matrix
-#x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
-
-#Add population
-#x@ped[,c("pop", "superpop")] <- LCT.matrix.pop1000G[,c("population", "super.population")]
-
-#Select EUR superpopulation
-#x <- select.inds(x, superpop=="EUR")
-#x@ped$pop <- droplevels(x@ped$pop)
+#x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
 #Group variants within CADD regions and genomic categories
-#x <- set.CADDregions(x)
+#x <- set.CADDregions(x, build = "b37")
 
 #Filter of rare variants: only non-monomorphic variants with
 #a MAF lower than 2.5%
-#and with a adjusted CADD score greater than the median
-#x1 <- filter.adjustedCADD(x, filter = "whole", maf.threshold = 0.025)
+#keeping only genomic regions with at least 200 SNP
+#x1 <- filter.rare.variants(x, filter = "whole", maf.threshold = 0.025, min.nb.snps = 200)
 
-#Simulation of a covariate + Sex as a covariate
-#sex <- x1@ped$sex
-#set.seed(1) ; u <- runif(nrow(x1))
+#Simulation of a continuous and a binary covariate
+#set.seed(1) ; sex <- sample(0:1, nrow(x1), replace = T) ;  u <- runif(nrow(x1))
 #covar <- cbind(sex, u)
 
 #Null model with the covariate sex and a continuous phenotype

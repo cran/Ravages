@@ -12,12 +12,13 @@ RAVA.FIRST(x, SNVs.scores = NULL, indels.scores = NULL, ref.level,
            maf.threshold=0.01, min.nb.snps = 2, 
            min.cumulative.maf = NULL, group = NULL, 
            cores = 10, burden = TRUE, H0.burden, burden.parameters, 
-           SKAT = TRUE, H0.SKAT, SKAT.parameters, verbose = TRUE, path.data)
+           SKAT = TRUE, H0.SKAT, SKAT.parameters, verbose = TRUE, 
+           path.data, build = c("b37", "b38"))
 }
 \arguments{
   \item{x}{ A bed.matrix }
-  \item{SNVs.scores}{ A dataframe containing the ADJUSTED CADD scores of the SNVs (Optional, useful to gain in computation time if the adjusted CADD scores of variants in the study are available)}
-  \item{indels.scores}{ A dataframe containing the CADD PHREDv1.4 scores of the indels - Compulsory if indels are present in \code{x}}
+  \item{SNVs.scores}{ A dataframe with the columns 'chr', 'pos', 'A1', 'A2' and 'adjCADD' containing the ADJUSTED CADD scores of the SNVs (Optional, useful to gain in computation time if the adjusted CADD scores of variants in the study are available)}
+  \item{indels.scores}{ A dataframe with the columns 'chr', 'pos', 'A1', 'A2' and 'PHRED_1.4' containing the CADD PHREDv1.4 scores of the indels - Compulsory if indels are present in \code{x}}
   \item{ref.level}{ The level corresponding to the controls group, only needed if \code{filter=="controls"} }
   \item{filter}{ On which group the MAF filter will be applied }
   \item{maf.threshold}{ The MAF threshold used to define a rare variant, set at 0.01 by default}
@@ -33,6 +34,7 @@ RAVA.FIRST(x, SNVs.scores = NULL, indels.scores = NULL, ref.level,
   \item{SKAT.parameters}{ A list containing the parameters to use by \code{SKAT} ('get.moments', 'estimation.pvalue', 'params.sampling', 'debug')}
   \item{verbose}{ Whether to display information about the function actions }
   \item{path.data}{ The repository where data for RAVA-FIRST are or will be downloaded from https://lysine.univ-brest.fr/RAVA-FIRST/}
+  \item{build}{The build of the data, either "b37" or "b38". The CADD Regions in the corresponding build will be considered}
 }
 \value{
   A list containing the results for the burden analysis ('burden') and the results for the SKAT analysis ('SKAT'), along with information about CADD regions (positions, type of genomic categories overlapped by each region and median of adjusted CADD scores).
@@ -46,6 +48,8 @@ RAVA.FIRST(x, SNVs.scores = NULL, indels.scores = NULL, ref.level,
   RAVA.FIRST() is based on the functions \code{set.CADDregions}, \code{filter.adjustedCADD}, \code{burden.subscores} and \code{SKAT}. Please refer to these functions for more information.
   Especially, refer to the functions \code{burden.subscores} and \code{SKAT} to get more information about what is need in \code{burden.parameters} and \code{SKAT.parameters}.   
 
+  bedtools need to be installed on the system if indels are present or if scores are not provided for SNVs.  
+
   It is recommended to use this function chromosome by chromosome for large datasets.
 }
 \source{https://lysine.univ-brest.fr/RAVA-FIRST/}
@@ -53,22 +57,39 @@ RAVA.FIRST(x, SNVs.scores = NULL, indels.scores = NULL, ref.level,
   \code{set.CADDregions}, \code{filter.adjustedCADD}, \code{burden.subscores}, \code{SKAT}
 }
 \examples{
-#Import 1000Genome data from region around LCT gene
-#x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
+##This example takes a few minutes to run. 
+##To run it quickly, we advise the user to decrease 
+##the number of variants or to increase the number of cores used
+#Import data in a bed matrix (example in build 37)
+#x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
-#Add population
-#x@ped[,c("pop", "superpop")] <- LCT.matrix.pop1000G[,c("population", "super.population")]
+#Remove the multi-allelic variants
+#x <- select.snps(x, !grepl(A2, pattern = ",") & !grepl(A1, pattern = ","))
 
-#Select EUR superpopulation
-#x <- select.inds(x, superpop=="EUR")
-#x@ped$pop <- droplevels(x@ped$pop)
+#Keep only the rare variants
+#x <- select.snps(x, maf <= 0.01 & maf > 0)
 
-#Remove indels from the bed matrix
-#x <- select.snps(x, nchar(A1)==1 & nchar(A2)==1)
+#Select the indels and make a dataframe to be used for annotation
+#x.vcf <- subset(x@snps, nchar(A1)>1 | nchar(A2)>1)[,c("chr", "pos", "id", "A1", "A2")]
+#Export the file for annotation 
+#write.table(x.vcf, file = "indels.toannotate.vcf", 
+#	     col.names = F, row.names = F, quote = F, sep = "\t")
 
-#Perform RAVA-FIRST with burden analysis
-#H0.burden <- NullObject.parameters(pheno = x@ped$pop, ref.level = "CEU",
+###############
+#Annotate the file in on CADD website (https://cadd.gs.washington.edu/score)
+#Please be careful here about which CADD version to use for annotation, here is v1.4 for b37
+###############
+
+#Download the results file, unzip it and load it in R
+#x.indels <- read.table("indels.annotated.tsv")
+#colnames(x.indels) <- c("chr", "pos", "A1", "A2", "CADD1.4", "PHRED_1.4")
+
+#Set the NULL model for burden testing
+#H0.burden <- NullObject.parameters(pheno = x@ped$population, ref.level = "CEU", 
 #                                   RVAT = "burden", pheno.type = "categorical")
-#res.burden <- RAVA.FIRST(x, maf.threshold = 0.05,
-#                         H0.burden = H0.burden, SKAT = F)
+
+#Run RAVA-FIRST
+#x.RAVAFIRST = RAVA.FIRST(x, indels.scores = x.indels, H0.burden = H0.burden, SKAT = F, cores = 1, 
+#                         path.data = "RAVA-FIRST/Package", maf.threshold = 1, build = "b37")
+
 }

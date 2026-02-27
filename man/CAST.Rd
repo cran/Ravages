@@ -22,13 +22,14 @@ By default, CAST counts if an individual carries at least one rare allele in the
 \references{ Morgenthaler S and Thilly WG. \emph{A strategy to discover genes that carry multi-allelic or mono-allelic risk for common diseases: a cohort allelic sums test (CAST).} Mutat Res. 2007}
 \examples{
 #Import data in a bed matrix
-x <- as.bed.matrix(x=LCT.matrix.bed, fam=LCT.matrix.fam, bim=LCT.snps)
+x <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
-# Group variants within known genes
+#Group variants within known genes
 x <- set.genomic.region(x)
 
-# Filter variants with maf (computed on whole sample) < 0.025
-# keeping only genomic region with at least 10 SNPs
+#Filter of rare variants: only non-monomorphic variants with
+#a MAF lower than 2.5%
+#keeping only genomic regions with at least 10 SNP
 x1 <- filter.rare.variants(x, filter = "whole", maf.threshold = 0.025, min.nb.snps = 10)
 
 # Compute burden score CAST

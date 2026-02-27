@@ -8,20 +8,24 @@
 }
 \usage{
 adjustedCADD.annotation.SNVs(x, variant.scores = NULL, 
-			     cores = 10, verbose = T, path.data)
+			     cores = 10, verbose = T, path.data,
+                             build = c("b37", "b38"))
 }
 \arguments{
   \item{x}{ A bed.matrix annotated with CADD regions using \code{set.CADDregions} }
-  \item{variant.scores}{ A dataframe containing the ADJUSTED CADD scores of the SNVs (Optional, useful to gain in computation time if the adjusted CADD scores of variants in the study are available)}
+  \item{variant.scores}{ A dataframe with the columns 'chr', 'pos', 'A1', 'A2' and 'adjCADD' containing the ADJUSTED CADD scores of the SNVs (Optional, useful to gain in computation time if the adjusted CADD scores of variants in the study are available)}
   \item{cores}{ How many cores to use, set at 10 by default}
   \item{verbose}{ Whether to display information about the function actions }
   \item{path.data}{ The repository where data for RAVA-FIRST are or will be downloaded from https://lysine.univ-brest.fr/RAVA-FIRST/}
+  \item{build}{The build of the data, either "b37" or "b38". The CADD Regions in the corresponding build will be considered}
 }
 \value{
   The bed matrix x with adjusted CADD scores in \code{adjCADD}.
 }
 \details{
-  SNVs are directly annotated with the adjusted CADD scores in the function using the file "AdjustedCADD_v1.4_202108.tsv.gz" downloaded from https://lysine.univ-brest.fr/RAVA-FIRST/ in the repository of the package Ravages or the scores of variants can be provided to \code{variant.scores} to gain in computation time (this file should contain 5 columns: the chromosome ('chr'), position ('pos'), reference allele ('A1'), alternative allele ('A2') and adjusted CADD scores ('adjCADD').  
+  bedtools need to be installed on the system if scores are not in \code{variants.scores} and need to be provided by Ravages.  
+
+  SNVs are directly annotated with the adjusted CADD scores in the function using the file "AdjustedCADD_v1.4_202108.tsv.gz" or "AdjustedCADD_v1.6_202602.tsv.gz" (depending on the build) downloaded from https://lysine.univ-brest.fr/RAVA-FIRST/ in the repository of the package Ravages or the scores of variants can be provided to \code{variant.scores} to gain in computation time (this file should contain 5 columns: the chromosome ('chr'), position ('pos'), reference allele ('A1'), alternative allele ('A2') and adjusted CADD scores ('adjCADD').  
 
   Those adjusted scores are used in the \code{RAVA.FIRST()} pipeline to filter rare variants.  
   
@@ -32,9 +36,17 @@ adjustedCADD.annotation.SNVs(x, variant.scores = NULL,
  \code{\link{adjustedCADD.annotation}, \link{adjustedCADD.annotation.indels}, \link{RAVA.FIRST}}, \code{\link{filter.adjustedCADD}} 
 }
 \examples{
+####Build37
 #Import 1000Genome data from region around LCT gene
-#x <- as.bed.matrix(LCT.gen, LCT.fam, LCT.bim)
+#x37 <- read.bed.matrix( system.file("extdata", "LCT.EUR.b37.bed", package="Ravages") )
 
 #Annotate variants with adjusted CADD score
-#x <- adjustedCADD.annotation.SNVs(x)
+#x37 <- adjustedCADD.annotation.SNVs(x37, build = "b37")
+
+####Build38
+#Import 1000Genome data from region around LCT gene
+#x38 <- read.bed.matrix( system.file("extdata", "LCT.EUR.b38.bed", package="Ravages") )
+
+#Annotate variants with adjusted CADD score
+#x38 <- adjustedCADD.annotation.SNVs(x38, build = "b38")
 }

@@ -65,7 +65,7 @@ run.mlogit.withNull <- function (pheno, score, region, ref.level, alt.levels, co
         if (get.effect.size == TRUE) OR.values <- my.model$CoefTable
       }else {
         my.model.H1 <- summary(fit)
-        pval <- pchisq(-2 * H0.LogLik + 2 * as.numeric(my.model.H1$logLik), nlevels(pheno) - 1, lower.tail = FALSE)
+        pval <- pchisq(-2 * H0.LogLik + 2 * as.numeric(my.model.H1$logLik[3]), nlevels(pheno) - 1, lower.tail = FALSE)
         if (get.effect.size == TRUE) OR.values <- my.model.H1$CoefTable
       }
       is.err <- 0
